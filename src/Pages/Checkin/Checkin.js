@@ -12,6 +12,7 @@ const CheckInPage = () => {
   const canvasRef = useRef(null); // Canvas to capture the image
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
+  const date = new Date().toLocaleDateString()
 
 
   // Fetch current time for display
@@ -145,7 +146,7 @@ const handleSubmit = async (event) => {
     try {
       const response = await axios.post("http://localhost:5000/checkin", {
         userId: user.id,
-        // Add other check-in details (note, image, etc.)
+        note,image,time,date,location
       });
   
       // Update the user's checked-in status locally
@@ -165,7 +166,7 @@ const handleSubmit = async (event) => {
     try {
       const response = await axios.post("http://localhost:5000/checkout", {
         userId: user.id,
-        // Add other check-out details (note, image, etc.)
+        note,image,time,date,location
       });
   
       // Update the user's checked-in status locally
@@ -240,9 +241,9 @@ const handleSubmit = async (event) => {
       {/* Submit Button */}
       <div className="text-center">
       {user && user.checkIn ? (
-      <button onClick={handleCheckOut}>Check Out</button>
+      <button className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center" onClick={handleCheckOut}>Check Out</button>
     ) : (
-      <button onClick={handleCheckIn}>Check In</button>
+      <button className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center" onClick={handleCheckIn}>Check In</button>
     )}
       </div>
     </div>

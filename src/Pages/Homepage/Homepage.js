@@ -6,6 +6,7 @@ const HomePage = () => {
   const [checkInTime, setCheckInTime] = useState(null);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   
   // Get today's date
@@ -18,11 +19,11 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
       navigate("/login"); // Redirect to login if not logged in
     }
   }, []);
+
 
   useEffect(() => {
     // Simulating check-in status check. You can fetch real data from an API here
@@ -64,7 +65,7 @@ const HomePage = () => {
       </div>
 
       <div className="bg-yellow-100 p-4 rounded-md mb-6">
-        {isCheckedIn ? (
+        {user.checkIn ? (
           <p className="text-xl text-green-600 font-semibold">
             Complete your Checkout
           </p>
@@ -75,9 +76,9 @@ const HomePage = () => {
         )}
         <Link
           to="/check-in" // Replace this with your actual check-in page route
-          className="w-full sm:w-auto bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
+          className="sm:w-auto bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
         >
-          {isCheckedIn ? "Go to Checkout" : "Complete your Check-in"}
+          {user.checkIn ? "Go to Checkout" : "Complete your Check-in"}
         </Link>
       </div>
 
@@ -93,7 +94,7 @@ const HomePage = () => {
         <div className="p-4 bg-white shadow-md rounded-md">
           <h4 className="font-semibold">Today's Check-in Status</h4>
           <p className="text-xl">
-            {isCheckedIn ? "Checked In" : "Not Checked In"}
+            {user.checkIn ? "Checked In" : "Not Checked In"}
           </p>
         </div>
       </div>
