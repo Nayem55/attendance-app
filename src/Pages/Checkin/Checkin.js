@@ -12,8 +12,7 @@ const CheckInPage = () => {
   const canvasRef = useRef(null); // Canvas to capture the image
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  const date = new Date().toLocaleDateString()
-
+  const date = new Date().toLocaleDateString();
 
   // Fetch current time for display
   useEffect(() => {
@@ -37,7 +36,8 @@ const CheckInPage = () => {
 
             // Extract relevant parts of the address (quarter, suburb, city)
             const quarter = data.address.quarter || "";
-            const suburb = data.address.suburb || data.address.neighborhood || "";
+            const suburb =
+              data.address.suburb || data.address.neighborhood || "";
             const city = data.address.city || "Dhaka"; // Default to Dhaka if not found
 
             // Format location as "Quarter, Suburb, City"
@@ -98,89 +98,62 @@ const CheckInPage = () => {
     setImage(imageData); // Set captured image to state
   };
 
-// Handle form submission
-const handleSubmit = async (event) => {
-    event.preventDefault();
-  
-    const checkInData = {
-      note,
-      image,
-      time,
-      date: new Date().toLocaleDateString(),
-      location,
-    };
-  
-    try {
-      const response = await fetch("http://localhost:5000/checkin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(checkInData),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        // Update the user's checked-in status in localStorage
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user) {
-          user.checkedIn = true; // Update the checked-in status
-          localStorage.setItem("user", JSON.stringify(user));
-        }
-  
-        alert("Check-in completed successfully!");
-        navigate("/home"); // Redirect to home page
-      } else {
-        alert(`Error: ${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error during check-in:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
-
   const handleCheckIn = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-  
+
     try {
       const response = await axios.post("http://localhost:5000/checkin", {
         userId: user.id,
-        note,image,time,date,location
+        note,
+        image,
+        time,
+        date,
+        location,
       });
-  
+
       // Update the user's checked-in status locally
       user.checkIn = true;
+      user.checkInTime= time
+      user.checkOutTime= ""
       localStorage.setItem("user", JSON.stringify(user));
-  
+
+
       toast.success(response.data.message);
       navigate("/home"); // Redirect after check-in
     } catch (error) {
-      toast.error(error.response ? error.response.data.message : "Error during check-in");
+      toast.error(
+        error.response ? error.response.data.message : "Error during check-in"
+      );
     }
   };
-  
+
   const handleCheckOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-  
+
     try {
       const response = await axios.post("http://localhost:5000/checkout", {
         userId: user.id,
-        note,image,time,date,location
+        note,
+        image,
+        time,
+        date,
+        location,
       });
-  
+
       // Update the user's checked-in status locally
       user.checkIn = false;
+      user.checkInTime= "";
+      user.checkOutTime= time;
       localStorage.setItem("user", JSON.stringify(user));
-  
+
       toast.success(response.data.message);
       navigate("/home"); // Redirect after check-out
     } catch (error) {
-      toast.error(error.response ? error.response.data.message : "Error during check-out");
+      toast.error(
+        error.response ? error.response.data.message : "Error during check-out"
+      );
     }
   };
-  
-  
 
   return (
     <div className="p-6">
@@ -201,12 +174,20 @@ const handleSubmit = async (event) => {
         >
           Capture Image
         </button>
-        {image && <img src={image} alt="Captured Check-In" className="w-full h-auto mt-2" />}
+        {image && (
+          <img
+            src={image}
+            alt="Captured Check-In"
+            className="w-full h-auto mt-2"
+          />
+        )}
       </div>
 
       {/* Note Input Section */}
       <div className="mb-6">
-        <label className="block text-lg font-medium mb-2">Note (Optional):</label>
+        <label className="block text-lg font-medium mb-2">
+          Note (Optional):
+        </label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -222,7 +203,9 @@ const handleSubmit = async (event) => {
           <thead>
             <tr>
               <th className="text-left p-2">Current Date</th>
-              <th className="text-left p-2">{new Date().toLocaleDateString()}</th>
+              <th className="text-left p-2">
+                {new Date().toLocaleDateString()}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -240,11 +223,21 @@ const handleSubmit = async (event) => {
 
       {/* Submit Button */}
       <div className="text-center">
-      {user && user.checkIn ? (
-      <button className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center" onClick={handleCheckOut}>Check Out</button>
-    ) : (
-      <button className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center" onClick={handleCheckIn}>Check In</button>
-    )}
+        {user && user.checkIn ? (
+          <button
+            className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
+            onClick={handleCheckOut}
+          >
+            Check Out
+          </button>
+        ) : (
+          <button
+            className="sm:w-full bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
+            onClick={handleCheckIn}
+          >
+            Check In
+          </button>
+        )}
       </div>
     </div>
   );
