@@ -120,7 +120,7 @@ const CheckInPage = () => {
 
       if (response.ok) {
         alert("Check-in completed successfully!");
-        navigate("/"); // Redirect to homepage after check-in
+        navigate("/home"); // Redirect to homepage after check-in
       } else {
         alert(`Error: ${data.message}`);
       }
