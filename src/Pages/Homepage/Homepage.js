@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom"; // Import Link for navigation
 
 const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
+  const navigate = useNavigate();
+
   
   // Get today's date
   const today = new Date();
@@ -14,6 +16,13 @@ const HomePage = () => {
     month: "long",
     day: "numeric",
   });
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      navigate("/login"); // Redirect to login if not logged in
+    }
+  }, []);
 
   useEffect(() => {
     // Simulating check-in status check. You can fetch real data from an API here

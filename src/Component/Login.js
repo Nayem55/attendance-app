@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast"; // Import react-hot-toast
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const LoginForm = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,28 +22,42 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
       const response = await axios.post("http://localhost:5000/login", formData);
-
+  
+      // Save user information in localStorage
+      const user = response.data.user; 
+      localStorage.setItem("user", JSON.stringify(user));
+  
       // Show success toast
       toast.success(response.data.message, {
         duration: 3000,
       });
+  
       setIsLoading(false);
+  
+      // Redirect to home page if logged in
+      navigate("/home");
     } catch (error) {
-      // Show error toast
-      toast.error(error.response ? error.response.data.message : "Something went wrong!", {
-        duration: 3000,
-      });
+      toast.error(
+        error.response ? error.response.data.message : "Something went wrong!",
+        {
+          duration: 3000,
+        }
+      );
+  
       setIsLoading(false);
     }
   };
-
+  
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-md shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-500">Attendance System</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-500">
+          Attendance System
+        </h2>
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <input
@@ -80,7 +96,10 @@ const LoginForm = () => {
 
         <div className="mt-6 text-center">
           <span className="text-sm text-gray-500">Don't have an account? </span>
-          <a href="/signup" className="text-sm text-blue-500 hover:text-blue-600">
+          <a
+            href="/signup"
+            className="text-sm text-blue-500 hover:text-blue-600"
+          >
             Sign up
           </a>
         </div>

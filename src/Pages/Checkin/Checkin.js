@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom"; // For navigation after submit
 
 const CheckInPage = () => {
@@ -9,6 +11,7 @@ const CheckInPage = () => {
   const videoRef = useRef(null); // Video element for camera preview
   const canvasRef = useRef(null); // Canvas to capture the image
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
 
   // Fetch current time for display
@@ -94,19 +97,18 @@ const CheckInPage = () => {
     setImage(imageData); // Set captured image to state
   };
 
-  // Handle form submission
-  const handleSubmit = async (event) => {
+// Handle form submission
+const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const checkInData = {
       note,
       image,
       time,
-      date:new Date().toLocaleDateString(),
+      date: new Date().toLocaleDateString(),
       location,
     };
-
-    // Perform check-in logic here (e.g., API request to save data)
+  
     try {
       const response = await fetch("http://localhost:5000/checkin", {
         method: "POST",
@@ -115,12 +117,19 @@ const CheckInPage = () => {
         },
         body: JSON.stringify(checkInData),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
+        // Update the user's checked-in status in localStorage
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user) {
+          user.checkedIn = true; // Update the checked-in status
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+  
         alert("Check-in completed successfully!");
-        navigate("/home"); // Redirect to homepage after check-in
+        navigate("/home"); // Redirect to home page
       } else {
         alert(`Error: ${data.message}`);
       }
@@ -129,6 +138,48 @@ const CheckInPage = () => {
       alert("An error occurred. Please try again.");
     }
   };
+
+  const handleCheckIn = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    try {
+      const response = await axios.post("http://localhost:5000/checkin", {
+        userId: user.id,
+        // Add other check-in details (note, image, etc.)
+      });
+  
+      // Update the user's checked-in status locally
+      user.checkIn = true;
+      localStorage.setItem("user", JSON.stringify(user));
+  
+      toast.success(response.data.message);
+      navigate("/home"); // Redirect after check-in
+    } catch (error) {
+      toast.error(error.response ? error.response.data.message : "Error during check-in");
+    }
+  };
+  
+  const handleCheckOut = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+  
+    try {
+      const response = await axios.post("http://localhost:5000/checkout", {
+        userId: user.id,
+        // Add other check-out details (note, image, etc.)
+      });
+  
+      // Update the user's checked-in status locally
+      user.checkIn = false;
+      localStorage.setItem("user", JSON.stringify(user));
+  
+      toast.success(response.data.message);
+      navigate("/home"); // Redirect after check-out
+    } catch (error) {
+      toast.error(error.response ? error.response.data.message : "Error during check-out");
+    }
+  };
+  
+  
 
   return (
     <div className="p-6">
@@ -188,12 +239,11 @@ const CheckInPage = () => {
 
       {/* Submit Button */}
       <div className="text-center">
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-500 text-white py-2 px-4 rounded-lg"
-        >
-          Complete Check-In
-        </button>
+      {user && user.checkIn ? (
+      <button onClick={handleCheckOut}>Check Out</button>
+    ) : (
+      <button onClick={handleCheckIn}>Check In</button>
+    )}
       </div>
     </div>
   );
