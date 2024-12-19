@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import dayjs from "dayjs"; // Import dayjs
-import duration from "dayjs/plugin/duration"; // Import duration plugin for calculating time differences
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import axios from "axios";
 
 dayjs.extend(duration);
 
 const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
+  const [totalCheckIns, setTotalCheckIns] = useState(0); 
+  const [lateCheckIns, setLateCheckIns] = useState(0);  // Store the count of late check-ins
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -31,6 +34,33 @@ const HomePage = () => {
   useEffect(() => {
     if (user?.checkIn && user?.checkInTime) {
       setIsCheckedIn(true);
+    }
+  }, [user]);
+
+  // Fetch total check-ins and late check-ins for the current month
+  useEffect(() => {
+    if (user) {
+      const fetchCheckIns = async () => {
+        try {
+          const response = await axios.get(`https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${user.id}`);
+          const checkins = response.data;
+
+          setTotalCheckIns(checkins.length); // Set the total check-ins
+
+          // Calculate late check-ins (after 10:15 AM)
+          const lateCheckInsCount = checkins.filter(checkin => {
+            const checkInTime = dayjs(checkin.time); // Convert check-in time to dayjs
+            const lateThreshold = dayjs(checkInTime.format('YYYY-MM-DD') + " 10:15:00"); // 10:15 AM on the same day
+            return checkInTime.isAfter(lateThreshold); // Check if check-in time is after 10:15 AM
+          }).length;
+
+          setLateCheckIns(lateCheckInsCount); // Set the late check-ins count
+        } catch (error) {
+          console.error("Error fetching check-ins:", error);
+        }
+      };
+
+      fetchCheckIns();
     }
   }, [user]);
 
@@ -86,11 +116,11 @@ const HomePage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="p-4 bg-white shadow-md rounded-md">
           <h4 className="font-semibold">December Check-ins</h4>
-          <p className="text-xl">13 Days</p>
+          <p className="text-xl">{totalCheckIns} Days</p>
         </div>
         <div className="p-4 bg-white shadow-md rounded-md">
           <h4 className="font-semibold">December Late Check-ins</h4>
-          <p className="text-xl">2 Days</p>
+          <p className="text-xl">{lateCheckIns} Days</p>
         </div>
         <div className="p-4 bg-white shadow-md rounded-md">
           <h4 className="font-semibold">Today's Check-in Status</h4>
