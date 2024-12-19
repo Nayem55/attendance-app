@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const Attendance = ({ userId }) => {
-  const [action, setAction] = useState('');
-  const [message, setMessage] = useState('');
+  const [action, setAction] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleAttendance = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/attendance', {
-        userId,
-        action,
-      });
+      const response = await axios.post(
+        "https://attendance-app-server-blue.vercel.app/attendance",
+        {
+          userId,
+          action,
+        }
+      );
 
       setMessage(response.data.message);
     } catch (error) {

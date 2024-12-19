@@ -22,21 +22,24 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
-      const response = await axios.post("http://localhost:5000/login", formData);
-  
+      const response = await axios.post(
+        "https://attendance-app-server-blue.vercel.app/login",
+        formData
+      );
+
       // Save user information in localStorage
-      const user = response.data.user; 
+      const user = response.data.user;
       localStorage.setItem("user", JSON.stringify(user));
-  
+
       // Show success toast
       toast.success(response.data.message, {
         duration: 3000,
       });
-  
+
       setIsLoading(false);
-  
+
       // Redirect to home page if logged in
       navigate("/home");
     } catch (error) {
@@ -46,12 +49,11 @@ const LoginForm = () => {
           duration: 3000,
         }
       );
-  
+
       setIsLoading(false);
     }
   };
-  
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-md shadow-lg">

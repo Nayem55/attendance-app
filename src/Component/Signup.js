@@ -73,7 +73,7 @@ const SignUpForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/signup",
+        "https://attendance-app-server-blue.vercel.app/signup",
         formData
       );
 

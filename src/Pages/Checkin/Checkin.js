@@ -102,21 +102,23 @@ const CheckInPage = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     try {
-      const response = await axios.post("http://localhost:5000/checkin", {
-        userId: user.id,
-        note,
-        image,
-        time,
-        date,
-        location,
-      });
+      const response = await axios.post(
+        "https://attendance-app-server-blue.vercel.app/checkin",
+        {
+          userId: user.id,
+          note,
+          image,
+          time,
+          date,
+          location,
+        }
+      );
 
       // Update the user's checked-in status locally
       user.checkIn = true;
-      user.checkInTime= time
-      user.checkOutTime= ""
+      user.checkInTime = time;
+      user.checkOutTime = "";
       localStorage.setItem("user", JSON.stringify(user));
-
 
       toast.success(response.data.message);
       navigate("/home"); // Redirect after check-in
@@ -131,19 +133,22 @@ const CheckInPage = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     try {
-      const response = await axios.post("http://localhost:5000/checkout", {
-        userId: user.id,
-        note,
-        image,
-        time,
-        date,
-        location,
-      });
+      const response = await axios.post(
+        "https://attendance-app-server-blue.vercel.app/checkout",
+        {
+          userId: user.id,
+          note,
+          image,
+          time,
+          date,
+          location,
+        }
+      );
 
       // Update the user's checked-in status locally
       user.checkIn = false;
-      user.checkInTime= "";
-      user.checkOutTime= time;
+      user.checkInTime = "";
+      user.checkOutTime = time;
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success(response.data.message);
