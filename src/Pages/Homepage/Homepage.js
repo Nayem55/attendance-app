@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom";
+import dayjs from "dayjs"; // Import dayjs
+import duration from "dayjs/plugin/duration"; // Import duration plugin for calculating time differences
+
+dayjs.extend(duration);
 
 const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [checkInTime, setCheckInTime] = useState(null);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -24,70 +27,37 @@ const HomePage = () => {
     }
   }, [user, navigate]);
 
-  // Check the user's check-in status and time
-  useEffect(() => {
-    const checkStatus = () => {
-
-      if (user?.checkIn === "true" && user?.checkInTime) {
-        setIsCheckedIn(true);
-        setCheckInTime(new Date(user?.checkInTime)); // Set check-in time
-      }
-    };
-
-    checkStatus();
-  }, []);
-
-  // Calculate total working hours based on check-in time
+  // Check the user's check-in status
   useEffect(() => {
     if (user?.checkIn && user?.checkInTime) {
-      // Convert the 12-hour time (e.g., "6:10:05 PM") to a 24-hour time format
-      const convertTo24HourFormat = (time) => {
-        const [timeString, modifier] = time.split(" ");
-        let [hours, minutes, seconds] = timeString.split(":");
-        hours = parseInt(hours, 10);
-  
-        // Convert hour based on AM/PM
-        if (modifier === "PM" && hours < 12) {
-          hours += 12;
-        } else if (modifier === "AM" && hours === 12) {
-          hours = 0;
-        }
-  
-        return `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`;
-      };
-  
-      // Convert check-in time to 24-hour format
-      const formattedCheckInTime = convertTo24HourFormat(user.checkInTime);
-  
-      // Create a valid Date object using the formatted time
-      const timeString = `1970-01-01T${formattedCheckInTime}`; // Use a fixed date
-      const checkInDate = new Date(timeString);
-  
-      // Check if the check-in date is valid
-      if (isNaN(checkInDate)) {
-        console.error("Invalid checkInTime format");
-        return;
-      }
-  
-      const currentTime = new Date(); // Current date and time
-      const difference = currentTime - checkInDate; // Time difference in milliseconds
-  
-      // Calculate hours, minutes, and seconds
-      const hours = Math.floor(difference / (1000 * 60 * 60)); // Convert milliseconds to hours
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Minutes
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000); // Seconds
-  
-      // Set the total working hours without the 4818 prefix
-      setTotalWorkingHours(
-        `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      );
+      setIsCheckedIn(true);
     }
-  }, [user?.checkInTime]);
-  
-  
+  }, [user]);
 
+  // Calculate active working hours after check-in
+  useEffect(() => {
+    let intervalId;
 
-  
+    if (isCheckedIn && user?.checkInTime) {
+      const calculateActiveTime = () => {
+        const checkInTime = dayjs(user.checkInTime);
+        const currentTime = dayjs();
+        const difference = dayjs.duration(currentTime.diff(checkInTime));
+
+        const hours = difference.hours().toString().padStart(2, "0");
+        const minutes = difference.minutes().toString().padStart(2, "0");
+        const seconds = difference.seconds().toString().padStart(2, "0");
+
+        setTotalWorkingHours(`${hours}:${minutes}:${seconds}`);
+      };
+
+      calculateActiveTime(); // Calculate immediately
+      intervalId = setInterval(calculateActiveTime, 1000); // Update every second
+    }
+
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+  }, [isCheckedIn, user]);
+
   return (
     <div className="p-6">
       {/* Display Today's Date */}
@@ -106,7 +76,7 @@ const HomePage = () => {
           </p>
         )}
         <Link
-          to="/check-in" // Replace this with your actual check-in page route
+          to="/check-in"
           className="sm:w-auto bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
         >
           {user?.checkIn ? "Go to Checkout" : "Complete your Check-in"}
