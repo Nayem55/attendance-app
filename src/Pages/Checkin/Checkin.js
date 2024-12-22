@@ -13,8 +13,9 @@ const CheckInPage = () => {
   const [note, setNote] = useState("");
   const [image, setImage] = useState(null);
   const [time, setTime] = useState("");
-  const [location, setLocation] = useState("");
+  // const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false); // Loading state
+  const [captured, setCaptured] = useState(false); // Track if the image is captured
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -29,39 +30,39 @@ const CheckInPage = () => {
     fetchCurrentTime();
   }, []);
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-            );
-            const data = await response.json();
-            const quarter = data.address.quarter || "";
-            const suburb =
-              data.address.suburb || data.address.neighborhood || "";
-            const city = data.address.city || "Dhaka";
-            setLocation(`${quarter}, ${suburb}, ${city}`);
-          },
-          (error) => {
-            console.error(error);
-            alert("Unable to fetch location: " + error.message);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
-        );
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchLocation = async () => {
+  //     if (navigator.geolocation) {
+  //       navigator.geolocation.getCurrentPosition(
+  //         async (position) => {
+  //           const { latitude, longitude } = position.coords;
+  //           const response = await fetch(
+  //             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+  //           );
+  //           const data = await response.json();
+  //           const quarter = data.address.quarter || "";
+  //           const suburb =
+  //             data.address.suburb || data.address.neighborhood || "";
+  //           const city = data.address.city || "Dhaka";
+  //           setLocation(`${quarter}, ${suburb}, ${city}`);
+  //         },
+  //         (error) => {
+  //           console.error(error);
+  //           alert("Unable to fetch location: " + error.message);
+  //         },
+  //         {
+  //           enableHighAccuracy: true,
+  //           timeout: 10000,
+  //           maximumAge: 0,
+  //         }
+  //       );
+  //     } else {
+  //       alert("Geolocation is not supported by this browser.");
+  //     }
+  //   };
 
-    fetchLocation();
-  }, []);
+  //   fetchLocation();
+  // }, []);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -99,11 +100,12 @@ const CheckInPage = () => {
       try {
         // Upload the image to ImgBB
         const response = await axios.post(
-          "https://api.imgbb.com/1/upload?expiration=300&key=293a0c42ccc6a11a4d90a9b7974dbb60", // ImgBB API
+          "https://api.imgbb.com/1/upload?expiration=2592000&key=293a0c42ccc6a11a4d90a9b7974dbb60", // ImgBB API
           formData
         );
         const imageUrl = response.data.data.url;
         setImage(imageUrl); // Set the uploaded image URL to the image state
+        setCaptured(true); // Set the captured state to true
         toast.success("Image uploaded successfully!");
       } catch (error) {
         toast.error("Failed to upload image.");
@@ -111,6 +113,12 @@ const CheckInPage = () => {
         setLoading(false); // Set loading state back to false after uploading
       }
     }, "image/png");
+  };
+
+  const handleRetake = () => {
+    setImage(null); // Clear the captured image
+    setCaptured(false); // Set captured state to false
+    canvasRef.current.style.display = "none"; // Show the canvas again
   };
 
   const handleCheckIn = async () => {
@@ -128,7 +136,7 @@ const CheckInPage = () => {
           image,
           time: checkInTime,
           date: "",
-          location,
+          // location,
         }
       );
 
@@ -162,7 +170,7 @@ const CheckInPage = () => {
           image,
           time: checkOutTime,
           date: "",
-          location,
+          // location,
         }
       );
 
@@ -189,16 +197,25 @@ const CheckInPage = () => {
         <video
           ref={videoRef}
           autoPlay
-          className="w-full h-auto border border-gray-300 rounded"
+          className="w-full h-auto border border-gray-300 rounded-lg"
         ></video>
         <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-        <button
-          onClick={handleCapture}
-          className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg"
-          disabled={loading} // Disable button while loading
-        >
-          {loading ? "Please wait..." : "Capture Image"}
-        </button>
+        {!captured ? (
+          <button
+            onClick={handleCapture}
+            className="w-full mt-4 bg-[#e57e38] text-white py-2 rounded-lg"
+            disabled={loading} // Disable button while loading
+          >
+            {loading ? "Please wait..." : "Capture Image"}
+          </button>
+        ) : (
+          <button
+            onClick={handleRetake}
+            className="w-full mt-4 bg-red-500 text-white py-2 rounded-lg"
+          >
+            Retake
+          </button>
+        )}
         {image && <img src={image} alt="Captured Check-In" className="mt-2" />}
       </div>
       <div className="mb-6">
@@ -209,7 +226,7 @@ const CheckInPage = () => {
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Add any note for your check-in..."
-          className="w-full p-2 border border-gray-300 rounded-md"
+          className="w-full p-2 border border-gray-300 rounded-lg"
           rows="4"
         />
       </div>
@@ -224,17 +241,17 @@ const CheckInPage = () => {
               <td className="p-2">Current Time</td>
               <td className="p-2">{time}</td>
             </tr>
-            <tr>
+            {/* <tr>
               <td className="p-2">Location</td>
               <td className="p-2">{location || "Fetching location..."}</td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
       <div className="text-center">
         {user && user.checkIn ? (
           <button
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded mt-2"
+            className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
             onClick={handleCheckOut}
             disabled={loading} // Disable button while loading
           >
@@ -242,7 +259,7 @@ const CheckInPage = () => {
           </button>
         ) : (
           <button
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded mt-2"
+            className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
             onClick={handleCheckIn}
             disabled={loading} // Disable button while loading
           >
