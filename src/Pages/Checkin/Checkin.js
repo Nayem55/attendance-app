@@ -14,6 +14,7 @@ const CheckInPage = () => {
   const [image, setImage] = useState(null);
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -78,20 +79,45 @@ const CheckInPage = () => {
     startCamera();
   }, []);
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     const video = videoRef.current;
+
+    // Draw the current frame of the video on the canvas
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = canvas.toDataURL("image/png");
-    setImage(imageData);
+
+    // Convert the canvas content to a Blob
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("image", blob, "capture.png");
+
+      setLoading(true); // Set loading state to true while uploading
+
+      try {
+        // Upload the image to ImgBB
+        const response = await axios.post(
+          "https://api.imgbb.com/1/upload?expiration=300&key=293a0c42ccc6a11a4d90a9b7974dbb60", // ImgBB API
+          formData
+        );
+        const imageUrl = response.data.data.url;
+        setImage(imageUrl); // Set the uploaded image URL to the image state
+        toast.success("Image uploaded successfully!");
+      } catch (error) {
+        toast.error("Failed to upload image.");
+      } finally {
+        setLoading(false); // Set loading state back to false after uploading
+      }
+    }, "image/png");
   };
 
   const handleCheckIn = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const checkInTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
+
+    setLoading(true); // Set loading state to true while submitting check-in
 
     try {
       const response = await axios.post(
@@ -116,12 +142,16 @@ const CheckInPage = () => {
       toast.error(
         error.response ? error.response.data.message : "Error during check-in"
       );
+    } finally {
+      setLoading(false); // Set loading state back to false after submission
     }
   };
 
   const handleCheckOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const checkOutTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
+
+    setLoading(true); // Set loading state to true while submitting check-out
 
     try {
       const response = await axios.post(
@@ -146,6 +176,8 @@ const CheckInPage = () => {
       toast.error(
         error.response ? error.response.data.message : "Error during check-out"
       );
+    } finally {
+      setLoading(false); // Set loading state back to false after submission
     }
   };
 
@@ -163,8 +195,9 @@ const CheckInPage = () => {
         <button
           onClick={handleCapture}
           className="w-full mt-4 bg-blue-500 text-white py-2 rounded-lg"
+          disabled={loading} // Disable button while loading
         >
-          Capture Image
+          {loading ? "Please wait..." : "Capture Image"}
         </button>
         {image && <img src={image} alt="Captured Check-In" className="mt-2" />}
       </div>
@@ -203,15 +236,17 @@ const CheckInPage = () => {
           <button
             className="w-full bg-blue-500 text-white py-2 px-4 rounded mt-2"
             onClick={handleCheckOut}
+            disabled={loading} // Disable button while loading
           >
-            Check Out
+            {loading ? "Please wait..." : "Check Out"}
           </button>
         ) : (
           <button
             className="w-full bg-blue-500 text-white py-2 px-4 rounded mt-2"
             onClick={handleCheckIn}
+            disabled={loading} // Disable button while loading
           >
-            Check In
+            {loading ? "Please wait..." : "Check In"}
           </button>
         )}
       </div>
