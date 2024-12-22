@@ -104,9 +104,9 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-md shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-500">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg mx-6">
+        <h2 className="text-2xl font-bold mb-6 text-center text-[#e57e38]">
           Create an Account
         </h2>
         <form onSubmit={handleSignUp} className="space-y-6">
@@ -116,7 +116,7 @@ const SignUpForm = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
               placeholder="Enter your name"
               required
             />
@@ -128,8 +128,8 @@ const SignUpForm = () => {
               name="number"
               value={formData.number}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your phone number (10 digits)"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+              placeholder="Enter your phone number"
               required
             />
           </div>
@@ -140,7 +140,7 @@ const SignUpForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
               placeholder="Enter your email"
               required
             />
@@ -152,7 +152,7 @@ const SignUpForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
               placeholder="Enter your password (min 6 characters)"
               required
             />
@@ -161,7 +161,7 @@ const SignUpForm = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full py-3 bg-[#e57e38] text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
               disabled={isLoading}
             >
               {isLoading ? "Signing Up..." : "Sign Up"}
@@ -175,7 +175,7 @@ const SignUpForm = () => {
           </span>
           <a
             href="/login"
-            className="text-sm text-blue-500 hover:text-blue-600"
+            className="text-sm text-[#e57e38] hover:text-blue-600"
           >
             Login here
           </a>

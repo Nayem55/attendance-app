@@ -107,7 +107,7 @@ const HomePage = () => {
         )}
         <Link
           to="/check-in"
-          className="sm:w-auto bg-blue-500 text-white py-2 px-4 rounded mt-2 block text-center"
+          className="sm:w-auto bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2 block text-center"
         >
           {user?.checkIn ? "Go to Checkout" : "Complete your Check-in"}
         </Link>
