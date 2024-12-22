@@ -9,8 +9,8 @@ dayjs.extend(duration);
 const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
-  const [totalCheckIns, setTotalCheckIns] = useState(0); 
-  const [lateCheckIns, setLateCheckIns] = useState(0);  // Store the count of late check-ins
+  const [totalCheckIns, setTotalCheckIns] = useState(0);
+  const [lateCheckIns, setLateCheckIns] = useState(0); // Store the count of late check-ins
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -42,15 +42,19 @@ const HomePage = () => {
     if (user) {
       const fetchCheckIns = async () => {
         try {
-          const response = await axios.get(`https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${user.id}`);
+          const response = await axios.get(
+            `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${user.id}`
+          );
           const checkins = response.data;
 
           setTotalCheckIns(checkins.length); // Set the total check-ins
 
           // Calculate late check-ins (after 10:15 AM)
-          const lateCheckInsCount = checkins.filter(checkin => {
+          const lateCheckInsCount = checkins.filter((checkin) => {
             const checkInTime = dayjs(checkin.time); // Convert check-in time to dayjs
-            const lateThreshold = dayjs(checkInTime.format('YYYY-MM-DD') + " 10:15:00"); // 10:15 AM on the same day
+            const lateThreshold = dayjs(
+              checkInTime.format("YYYY-MM-DD") + " 10:15:00"
+            ); // 10:15 AM on the same day
             return checkInTime.isAfter(lateThreshold); // Check if check-in time is after 10:15 AM
           }).length;
 
@@ -92,11 +96,13 @@ const HomePage = () => {
     <div className="p-6">
       {/* Display Today's Date */}
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold">Today's Date: {formattedDate}</h2>
+        <h2 className="text-2xl font-semibold">
+          Today's Date: {formattedDate}
+        </h2>
       </div>
 
       <div className="bg-yellow-100 p-4 rounded-md mb-6">
-        {user?.checkIn ? (
+        {/* {user?.checkIn ? (
           <p className="text-xl text-green-600 font-semibold">
             Complete your Checkout
           </p>
@@ -104,12 +110,16 @@ const HomePage = () => {
           <p className="text-xl text-red-600 font-semibold">
             Complete your Check-in
           </p>
-        )}
+        )} */}
+        <p className="text-xl text-[#000] font-semibold">
+          Reminder
+        </p>
+
         <Link
           to="/check-in"
           className="sm:w-auto bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2 block text-center"
         >
-          {user?.checkIn ? "Go to Checkout" : "Complete your Check-in"}
+          {user?.checkIn ? "Complete Your Checkout" : "Complete Your Check-in"}
         </Link>
       </div>
 
