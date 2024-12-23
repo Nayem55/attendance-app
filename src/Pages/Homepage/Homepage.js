@@ -148,7 +148,7 @@ const HomePage = () => {
             </p>
           </div>
         </div>
-        <div className="p-4 bg-white rounded-lg mt-6 bg-[#E57E38] text-white">
+        <div className="p-4 rounded-lg mt-6 bg-[#E57E38] text-white">
           <h4 className="font-bold">Total Working Hours</h4>
           <p className="text-xl mt-4 font-semibold">{totalWorkingHours}</p>
         </div>
