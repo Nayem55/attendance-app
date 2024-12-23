@@ -190,8 +190,8 @@ const CheckInPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold text-center mb-4">Check-In Page</h2>
+    <div className="p-6 py-10 pb-16">
+      <h2 className="text-2xl font-semibold text-center mb-4">Attendance</h2>
       <div className="mb-6">
        {
         !captured &&

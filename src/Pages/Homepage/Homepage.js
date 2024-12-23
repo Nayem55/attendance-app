@@ -93,15 +93,15 @@ const HomePage = () => {
   }, [isCheckedIn, user]);
 
   return (
-    <div className="p-6">
+    <div className="p-6 py-10 pb-16 bg-[#F2F2F2]">
       {/* Display Today's Date */}
-      <div className="text-center mb-6">
+      {/* <div className="text-center mb-6">
         <h2 className="text-2xl font-semibold">
           Today's Date: {formattedDate}
         </h2>
-      </div>
+      </div> */}
 
-      <div className="bg-yellow-100 p-4 rounded-md mb-6">
+      <div className=" p-4 rounded-md mb-6 bg-white shadow-md">
         {/* {user?.checkIn ? (
           <p className="text-xl text-green-600 font-semibold">
             Complete your Checkout
@@ -111,38 +111,47 @@ const HomePage = () => {
             Complete your Check-in
           </p>
         )} */}
-        <p className="text-xl text-[#000] font-semibold">
-          Reminder
-        </p>
+        <p className="text-xl text-[#000] font-semibold">Reminder</p>
 
         <Link
           to="/check-in"
-          className="sm:w-auto bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2 block text-center"
+          className="sm:w-auto bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2 block text-center font-bold"
         >
           {user?.checkIn ? "Complete Your Checkout" : "Complete Your Check-in"}
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="p-4 bg-white shadow-md rounded-md">
-          <h4 className="font-semibold">December Check-ins</h4>
-          <p className="text-xl">{totalCheckIns} Days</p>
-        </div>
-        <div className="p-4 bg-white shadow-md rounded-md">
-          <h4 className="font-semibold">December Late Check-ins</h4>
-          <p className="text-xl">{lateCheckIns} Days</p>
-        </div>
-        <div className="p-4 bg-white shadow-md rounded-md">
-          <h4 className="font-semibold">Today's Check-in Status</h4>
-          <p className="text-xl">
-            {user?.checkIn ? "Checked In" : "Not Checked In"}
-          </p>
-        </div>
-      </div>
+      <div className="bg-[#ffffff] p-4 rounded-lg shadow-md pb-10">
+        <p className="text-xl text-[#000] font-semibold mb-4">Summary</p>
 
-      <div className="mt-6 p-4 bg-white shadow-md rounded-md">
-        <h4 className="font-semibold">Total Working Hours</h4>
-        <p className="text-2xl">{totalWorkingHours}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
+            <h4 className="font-semibold">December Attendance</h4>
+            <p className="text-xl mt-4">{totalCheckIns} Days</p>
+          </div>
+          <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
+            <h4 className="font-semibold">December Late</h4>
+            <p className="text-xl mt-4">{lateCheckIns} Days</p>
+          </div>
+          <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
+            <h4 className="font-semibold">Today's Status</h4>
+            <p className="text-xl mt-4">
+              {user?.checkIn ? "Checked In" : "Not Checked In"}
+            </p>
+          </div>
+          <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
+            <h4 className="font-semibold">Today's In Time</h4>
+            <p className="text-xl mt-4">
+              {user?.checkIn
+                ? dayjs(user?.checkInTime).tz("Asia/Dhaka").format("hh:mm A")
+                : "00.00.00"}
+            </p>
+          </div>
+        </div>
+        <div className="p-4 bg-white rounded-lg mt-6 bg-[#E57E38] text-white">
+          <h4 className="font-bold">Total Working Hours</h4>
+          <p className="text-xl mt-4 font-semibold">{totalWorkingHours}</p>
+        </div>
       </div>
     </div>
   );
