@@ -193,12 +193,17 @@ const CheckInPage = () => {
     <div className="p-6">
       <h2 className="text-2xl font-semibold text-center mb-4">Check-In Page</h2>
       <div className="mb-6">
+       {
+        !captured &&
+        <>
         <label className="block text-lg font-medium mb-2">Capture Image:</label>
         <video
           ref={videoRef}
           autoPlay
-          className="w-full h-auto border border-gray-300 rounded-lg"
+          className={`w-full h-auto border border-gray-300 rounded-lg`}
         ></video>
+        </>
+       }
         <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
         {!captured ? (
           <button
