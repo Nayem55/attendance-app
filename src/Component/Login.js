@@ -88,7 +88,7 @@ const LoginForm = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-3 bg-[#e57e38] text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+              className="w-full py-3 bg-[#e57e38] text-white font-semibold rounded-md hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
               disabled={isLoading}
             >
               {isLoading ? "Logging In..." : "Login"}
@@ -100,7 +100,7 @@ const LoginForm = () => {
           <span className="text-sm text-gray-500">Don't have an account? </span>
           <a
             href="/signup"
-            className="text-sm text-[#e57e38] hover:text-blue-600"
+            className="text-sm text-[#e57e38] hover:black"
           >
             Sign up
           </a>
