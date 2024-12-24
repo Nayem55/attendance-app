@@ -14,7 +14,7 @@ const HomePage = () => {
   const [totalCheckIns, setTotalCheckIns] = useState(0);
   const [lateCheckIns, setLateCheckIns] = useState(0);
   const [user, setUser] = useState({});
-  const [dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
