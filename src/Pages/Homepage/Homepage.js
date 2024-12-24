@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import axios from "axios";
+import { ThemeContext } from "../../Contexts/ThemeContext";
 
 dayjs.extend(duration);
 
 const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
-  const [totalCheckIns, setTotalCheckIns] = useState(0);
-  const [user, setUser] = useState({});
-  const [lateCheckIns, setLateCheckIns] = useState(0); 
+  const [totalCheckIns, setTotalCheckIns] = useState(null); // null for loading state
+  const [lateCheckIns, setLateCheckIns] = useState(null); // null for loading state
+  const { user } = useContext(ThemeContext);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -44,7 +45,7 @@ const HomePage = () => {
       const fetchCheckIns = async () => {
         try {
           const response = await axios.get(
-            `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser.id}`
+            `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser._id}`
           );
           const checkins = response.data;
 
@@ -52,7 +53,7 @@ const HomePage = () => {
 
           // Calculate late check-ins (after 10:15 AM)
           const lateCheckInsCount = checkins.filter((checkin) => {
-            const checkInTime = dayjs(checkin.time); 
+            const checkInTime = dayjs(checkin.time);
             const lateThreshold = dayjs(
               checkInTime.format("YYYY-MM-DD") + " 10:15:00"
             ); // 10:15 AM on the same day
@@ -64,24 +65,10 @@ const HomePage = () => {
           console.error("Error fetching check-ins:", error);
         }
       };
-      const fetchUser = async () => {
-        try {
-          const response = await axios.get(
-            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser.id}`
-          );
-          const user = response.data;
-
-          setUser(user);
-        } catch (error) {
-          console.error("Error fetching user", error);
-        }
-      };
 
       fetchCheckIns();
-      fetchUser()
     }
   }, [storedUser]);
- 
 
   useEffect(() => {
     let intervalId;
@@ -106,26 +93,9 @@ const HomePage = () => {
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [isCheckedIn, user]);
 
-
   return (
     <div className="p-6 py-10 pb-16 bg-[#F2F2F2]">
-      {/* Display Today's Date */}
-      {/* <div className="text-center mb-6">
-        <h2 className="text-2xl font-semibold">
-          Today's Date: {formattedDate}
-        </h2>
-      </div> */}
-
-      <div className=" p-4 rounded-md mb-6 bg-white shadow-md">
-        {/* {user?.checkIn ? (
-          <p className="text-xl text-green-600 font-semibold">
-            Complete your Checkout
-          </p>
-        ) : (
-          <p className="text-xl text-red-600 font-semibold">
-            Complete your Check-in
-          </p>
-        )} */}
+      <div className="p-4 rounded-md mb-6 bg-white shadow-md">
         <p className="text-xl text-[#000] font-semibold">Reminder</p>
 
         <Link
@@ -142,11 +112,15 @@ const HomePage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
             <h4 className="font-semibold">December Attendance</h4>
-            <p className="text-xl mt-4">{totalCheckIns} Days</p>
+            <p className="text-xl mt-4">
+              {totalCheckIns !== null ? `${totalCheckIns} Days` : "Calculating..."}
+            </p>
           </div>
           <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
             <h4 className="font-semibold">December Late</h4>
-            <p className="text-xl mt-4">{lateCheckIns} Days</p>
+            <p className="text-xl mt-4">
+              {lateCheckIns !== null ? `${lateCheckIns} Days` : "Calculating..."}
+            </p>
           </div>
           <div className="p-4 bg-white border border-[#cfcfcf] rounded-lg flex flex-col justify-center items-center text-center mx-auto sm:w-full">
             <h4 className="font-semibold">Today's Status</h4>
@@ -158,7 +132,6 @@ const HomePage = () => {
             <h4 className="font-semibold">Today's In Time</h4>
             <p className="text-xl mt-4">
               {user?.checkIn
-              
                 ? dayjs(user?.lastCheckedIn).tz("Asia/Dhaka").format("hh:mm A")
                 : "00.00.00"}
             </p>
@@ -166,7 +139,9 @@ const HomePage = () => {
         </div>
         <div className="p-4 rounded-lg mt-6 bg-[#E57E38] text-white">
           <h4 className="font-bold">Total Working Hours</h4>
-          <p className="text-xl mt-4 font-semibold">{totalWorkingHours}</p>
+          <p className="text-xl mt-4 font-semibold">
+            {user?.checkIn ? totalWorkingHours : "00.00.00"}
+          </p>
         </div>
       </div>
     </div>
