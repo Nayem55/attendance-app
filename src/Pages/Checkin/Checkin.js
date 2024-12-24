@@ -1,11 +1,10 @@
 import axios from "axios";
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { ThemeContext } from "../../Contexts/ThemeContext";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -15,9 +14,10 @@ const CheckInPage = () => {
   const [image, setImage] = useState(null);
   const [time, setTime] = useState("");
   // const [location, setLocation] = useState("");
-  const {loading, setLoading} = useContext(ThemeContext);
+  const [loading, setLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
   const [captured, setCaptured] = useState(false);
-  const { user } = useContext(ThemeContext);
+  const [user, setUser] = useState({});
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -29,7 +29,23 @@ const CheckInPage = () => {
   };
 
   useEffect(() => {
-    fetchCurrentTime();
+    if (storedUser) {
+      const fetchUser = async () => {
+        try {
+          const response = await axios.get(
+            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?.id}`
+          );
+          const user = response.data;
+          setUser(user);
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+        setUserLoading(false);
+      };
+
+      fetchUser();
+      fetchCurrentTime();
+    }
   }, []);
 
   // useEffect(() => {
@@ -271,7 +287,7 @@ const CheckInPage = () => {
             onClick={handleCheckIn}
             disabled={loading} // Disable button while loading
           >
-            {loading ? "Please wait..." : "Check In"}
+            {(userLoading||loading) ? "Please wait..." : "Check In"}
           </button>
         )}
       </div>
