@@ -10,9 +10,10 @@ const HomePage = () => {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [totalWorkingHours, setTotalWorkingHours] = useState("00:00:00");
   const [totalCheckIns, setTotalCheckIns] = useState(0);
-  const [lateCheckIns, setLateCheckIns] = useState(0); // Store the count of late check-ins
+  const [user, setUser] = useState({});
+  const [lateCheckIns, setLateCheckIns] = useState(0); 
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   // Get today's date
   const today = new Date();
@@ -25,33 +26,33 @@ const HomePage = () => {
 
   // Check if the user is logged in and redirect if not
   useEffect(() => {
-    if (!user) {
+    if (!storedUser) {
       navigate("/login"); // Redirect to login if not logged in
     }
-  }, [user, navigate]);
+  }, [storedUser, navigate]);
 
   // Check the user's check-in status
   useEffect(() => {
-    if (user?.checkIn && user?.checkInTime) {
+    if (user?.checkIn && user?.lastCheckedIn) {
       setIsCheckedIn(true);
     }
   }, [user]);
 
   // Fetch total check-ins and late check-ins for the current month
   useEffect(() => {
-    if (user) {
+    if (storedUser) {
       const fetchCheckIns = async () => {
         try {
           const response = await axios.get(
-            `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${user.id}`
+            `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser.id}`
           );
           const checkins = response.data;
 
-          setTotalCheckIns(checkins.length); // Set the total check-ins
+          setTotalCheckIns(checkins.length);
 
           // Calculate late check-ins (after 10:15 AM)
           const lateCheckInsCount = checkins.filter((checkin) => {
-            const checkInTime = dayjs(checkin.time); // Convert check-in time to dayjs
+            const checkInTime = dayjs(checkin.time); 
             const lateThreshold = dayjs(
               checkInTime.format("YYYY-MM-DD") + " 10:15:00"
             ); // 10:15 AM on the same day
@@ -63,18 +64,31 @@ const HomePage = () => {
           console.error("Error fetching check-ins:", error);
         }
       };
+      const fetchUser = async () => {
+        try {
+          const response = await axios.get(
+            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser.id}`
+          );
+          const user = response.data;
+
+          setUser(user);
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      };
 
       fetchCheckIns();
+      fetchUser()
     }
-  }, [user]);
+  }, [storedUser]);
+ 
 
-  // Calculate active working hours after check-in
   useEffect(() => {
     let intervalId;
 
-    if (isCheckedIn && user?.checkInTime) {
+    if (isCheckedIn && user?.lastCheckedIn) {
       const calculateActiveTime = () => {
-        const checkInTime = dayjs(user.checkInTime);
+        const checkInTime = dayjs(user?.lastCheckedIn);
         const currentTime = dayjs();
         const difference = dayjs.duration(currentTime.diff(checkInTime));
 
@@ -91,6 +105,7 @@ const HomePage = () => {
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [isCheckedIn, user]);
+
 
   return (
     <div className="p-6 py-10 pb-16 bg-[#F2F2F2]">
@@ -143,7 +158,8 @@ const HomePage = () => {
             <h4 className="font-semibold">Today's In Time</h4>
             <p className="text-xl mt-4">
               {user?.checkIn
-                ? dayjs(user?.checkInTime).tz("Asia/Dhaka").format("hh:mm A")
+              
+                ? dayjs(user?.lastCheckedIn).tz("Asia/Dhaka").format("hh:mm A")
                 : "00.00.00"}
             </p>
           </div>

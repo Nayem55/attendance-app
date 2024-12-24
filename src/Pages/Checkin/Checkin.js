@@ -14,12 +14,13 @@ const CheckInPage = () => {
   const [image, setImage] = useState(null);
   const [time, setTime] = useState("");
   // const [location, setLocation] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
-  const [captured, setCaptured] = useState(false); // Track if the image is captured
+  const [loading, setLoading] = useState(false);
+  const [captured, setCaptured] = useState(false);
+  const [user, setUser] = useState({});
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   const fetchCurrentTime = () => {
     const currentTime = dayjs().tz("Asia/Dhaka").format("hh:mm A");
@@ -27,7 +28,23 @@ const CheckInPage = () => {
   };
 
   useEffect(() => {
-    fetchCurrentTime();
+    if (storedUser) {
+      const fetchUser = async () => {
+        try {
+          const response = await axios.get(
+            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?.id}`
+          );
+          const user = response.data;
+
+          setUser(user);
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      };
+
+      fetchUser();
+      fetchCurrentTime();
+    }
   }, []);
 
   // useEffect(() => {
@@ -193,17 +210,18 @@ const CheckInPage = () => {
     <div className="p-6 py-10 pb-16">
       <h2 className="text-2xl font-semibold text-center mb-4">Attendance</h2>
       <div className="mb-6">
-       {
-        !captured &&
-        <>
-        <label className="block text-lg font-medium mb-2">Capture Image:</label>
-        <video
-          ref={videoRef}
-          autoPlay
-          className={`w-full h-auto border border-gray-300 rounded-lg`}
-        ></video>
-        </>
-       }
+        {!captured && (
+          <>
+            <label className="block text-lg font-medium mb-2">
+              Capture Image:
+            </label>
+            <video
+              ref={videoRef}
+              autoPlay
+              className={`w-full h-auto border border-gray-300 rounded-lg`}
+            ></video>
+          </>
+        )}
         <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
         {!captured ? (
           <button
@@ -254,7 +272,7 @@ const CheckInPage = () => {
         </table>
       </div>
       <div className="text-center">
-        {user && user.checkIn ? (
+        {user && user?.checkIn ? (
           <button
             className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
             onClick={handleCheckOut}
