@@ -62,7 +62,7 @@ const HomePage = () => {
     } else {
       fetchUserData();
     }
-  }, [storedUser, navigate, fetchUserData]);
+  }, []);
 
   useEffect(() => {
     let intervalId;
