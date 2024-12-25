@@ -15,13 +15,13 @@ const CheckInPage = () => {
   const [time, setTime] = useState("");
   // const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userLoading, setUserLoading] = useState(true);
+  // const [userLoading, setUserLoading] = useState(true);
   const [captured, setCaptured] = useState(false);
-  const [user, setUser] = useState({});
+  // const [user, setUser] = useState({});
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const fetchCurrentTime = () => {
     const currentTime = dayjs().tz("Asia/Dhaka").format("hh:mm A");
@@ -29,23 +29,24 @@ const CheckInPage = () => {
   };
 
   useEffect(() => {
-    if (storedUser) {
-      const fetchUser = async () => {
-        try {
-          const response = await axios.get(
-            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?.id}`
-          );
-          const user = response.data;
-          setUser(user);
-        } catch (error) {
-          console.error("Error fetching user", error);
-        }
-        setUserLoading(false);
-      };
+    // if (storedUser) {
+    //   const fetchUser = async () => {
+    //     try {
+    //       const response = await axios.get(
+    //         `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?.id}`
+    //       );
+    //       const user = response.data;
+    //       setUser(user);
+    //     } catch (error) {
+    //       console.error("Error fetching user", error);
+    //     }
+    //     setUserLoading(false);
+    //   };
 
-      fetchUser();
-      fetchCurrentTime();
-    }
+    //   fetchUser();
+    //   fetchCurrentTime();
+    // }
+    fetchCurrentTime();
   }, []);
 
   // useEffect(() => {
@@ -149,7 +150,7 @@ const CheckInPage = () => {
       const response = await axios.post(
         "https://attendance-app-server-blue.vercel.app/checkin",
         {
-          userId: user.id,
+          userId: user?._id,
           note,
           image,
           time: checkInTime,
@@ -159,7 +160,7 @@ const CheckInPage = () => {
       );
 
       user.checkIn = true;
-      user.checkInTime = checkInTime;
+      // user.checkInTime = checkInTime;
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success(response.data.message);
@@ -183,7 +184,7 @@ const CheckInPage = () => {
       const response = await axios.post(
         "https://attendance-app-server-blue.vercel.app/checkout",
         {
-          userId: user.id,
+          userId: user?._id,
           note,
           image,
           time: checkOutTime,
@@ -193,7 +194,7 @@ const CheckInPage = () => {
       );
 
       user.checkIn = false;
-      user.checkOutTime = checkOutTime;
+      // user.checkOutTime = checkOutTime;
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success(response.data.message);
@@ -287,7 +288,7 @@ const CheckInPage = () => {
             onClick={handleCheckIn}
             disabled={loading} // Disable button while loading
           >
-            {(userLoading||loading) ? "Please wait..." : "Check In"}
+            {(loading) ? "Please wait..." : "Check In"}
           </button>
         )}
       </div>

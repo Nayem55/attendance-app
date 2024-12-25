@@ -24,10 +24,10 @@ const HomePage = () => {
     try {
       const [userResponse, checkInsResponse] = await Promise.all([
         axios.get(
-          `https://attendance-app-server-blue.vercel.app/getUser/${storedUser.id}`
+          `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?._id}`
         ),
         axios.get(
-          `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser.id}`
+          `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser?._id}`
         ),
       ]);
 
@@ -35,13 +35,14 @@ const HomePage = () => {
       const checkins = checkInsResponse.data;
 
       setUser(userData);
+      localStorage.setItem("user",JSON.stringify(userData));
       setTotalCheckIns(checkins.length);
 
       // Calculate late check-ins (after 10:15 AM)
       const lateCheckInsCount = checkins.filter((checkin) => {
         const checkInTime = dayjs(checkin.time);
         const lateThreshold = dayjs(
-          checkInTime.format("YYYY-MM-DD") + " 10:15:00"
+          checkInTime.format("YYYY-MM-DD") + "10:15:00"
         );
         return checkInTime.isAfter(lateThreshold);
       }).length;
