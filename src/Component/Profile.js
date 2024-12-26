@@ -8,29 +8,37 @@ const Profile = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, []);
 
   const handleSave = async () => {
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match.");
       return;
     }
-  
-    const updatedUser = { ...user, password: newPassword || user.password };
-  
+
+    const updatedUser = { ...user, password: newPassword || user?.password };
+
     try {
       // Send a PUT request to update the user
-      const response = await fetch(`https://attendance-app-server-blue.vercel.app/updateUser/${user._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedUser),
-      });
-  
+      const response = await fetch(
+        `https://attendance-app-server-blue.vercel.app/updateUser/${user?._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedUser),
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         toast.success(data.message);
-  
+
         // Update local storage with the updated user data
         localStorage.setItem("user", JSON.stringify(updatedUser));
         setUser(updatedUser);
@@ -43,19 +51,28 @@ const Profile = () => {
       toast.error("Something went wrong. Please try again later.");
     }
   };
-  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4 mb-12">
       <div className="w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-center mb-4">Profile</h2>
-          <button onClick={()=>{
-            localStorage.removeItem("user");
-            navigate("/login")
-          }} className="text-2xl font-semibold text-center mb-4">
-            <svg className="w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-              <path fill="#ff0000" d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 224c0 17.7 14.3 32 32 32s32-14.3 32-32l0-224zM143.5 120.6c13.6-11.3 15.4-31.5 4.1-45.1s-31.5-15.4-45.1-4.1C49.7 115.4 16 181.8 16 256c0 132.5 107.5 240 240 240s240-107.5 240-240c0-74.2-33.8-140.6-86.6-184.6c-13.6-11.3-33.8-9.4-45.1 4.1s-9.4 33.8 4.1 45.1c38.9 32.3 63.5 81 63.5 135.4c0 97.2-78.8 176-176 176s-176-78.8-176-176c0-54.4 24.7-103.1 63.5-135.4z" />
+          <button
+            onClick={() => {
+              localStorage.removeItem("user");
+              navigate("/login");
+            }}
+            className="text-2xl font-semibold text-center mb-4"
+          >
+            <svg
+              className="w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+            >
+              <path
+                fill="#ff0000"
+                d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 224c0 17.7 14.3 32 32 32s32-14.3 32-32l0-224zM143.5 120.6c13.6-11.3 15.4-31.5 4.1-45.1s-31.5-15.4-45.1-4.1C49.7 115.4 16 181.8 16 256c0 132.5 107.5 240 240 240s240-107.5 240-240c0-74.2-33.8-140.6-86.6-184.6c-13.6-11.3-33.8-9.4-45.1 4.1s-9.4 33.8 4.1 45.1c38.9 32.3 63.5 81 63.5 135.4c0 97.2-78.8 176-176 176s-176-78.8-176-176c0-54.4 24.7-103.1 63.5-135.4z"
+              />
             </svg>
           </button>
         </div>
@@ -68,7 +85,7 @@ const Profile = () => {
             type="text"
             id="name"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
-            value={user.name}
+            value={user?.name}
             onChange={(e) => setUser({ ...user, name: e.target.value })}
           />
         </div>
@@ -81,7 +98,7 @@ const Profile = () => {
             type="email"
             id="email"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
-            value={user.email}
+            value={user?.email}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
         </div>
@@ -93,7 +110,7 @@ const Profile = () => {
             type="number"
             id="number"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
-            value={user.number}
+            value={user?.number}
             onChange={(e) => setUser({ ...user, number: e.target.value })}
           />
         </div>

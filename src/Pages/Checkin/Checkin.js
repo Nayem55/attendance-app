@@ -27,6 +27,11 @@ const CheckInPage = () => {
     const currentTime = dayjs().tz("Asia/Dhaka").format("hh:mm A");
     setTime(currentTime);
   };
+    useEffect(() => {
+      if (!user) {
+        navigate("/login");
+      } 
+    }, []);
 
   useEffect(() => {
     // if (storedUser) {
