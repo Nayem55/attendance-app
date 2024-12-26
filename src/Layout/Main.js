@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import logo from "../Images/Gvi-logo.png"
+import BottomBar from "../Component/BottomBar";
 
 const Main = () => {
   const { pathname } = useLocation();
@@ -20,6 +21,7 @@ const Main = () => {
       </Link>
       </Link>
       <Outlet></Outlet>
+      <BottomBar/>
     </div>
   );
 };

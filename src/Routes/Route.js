@@ -24,6 +24,10 @@ const router = createBrowserRouter([
         element: <CheckInPage />,
       },
       {
+        path: "/attendance",
+        element: <CheckInPage />,
+      },
+      {
         path: "/login",
         element: <LoginForm />,
       },
