@@ -6,6 +6,7 @@ import HomePage from "../Pages/Homepage/Homepage";
 import CheckInPage from "../Pages/Checkin/Checkin";
 import Profile from "../Component/Profile";
 import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
+import TodaysReport from "../Pages/AdminDashboard/TodaysReport";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: <AdminDashboard/>,
+      },
+      {
+        path: "/admin/today-report",
+        element: <TodaysReport/>,
       },
     ],
   },

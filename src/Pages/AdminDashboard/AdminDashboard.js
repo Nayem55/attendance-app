@@ -86,13 +86,13 @@ const AdminDashboard = () => {
         </div>
         <nav className="flex flex-col p-4 space-y-2">
           <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
-            Dashboard
+            Attendance Report
+          </Link>
+          <Link to="/admin/today-report" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+            Today's Report
           </Link>
           <Link to="/admin/users" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
             Users
-          </Link>
-          <Link to="/admin/reports" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
-            Reports
           </Link>
           <Link to="/admin/settings" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
             Settings
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
           {isDrawerOpen ? "Close Menu" : "Open Menu"}
         </button>
 
-        <h1 className="text-xl font-bold mb-4">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold mb-4">Monthly Report</h1>
         <div className="mb-4">
           <label className="mr-2 font-semibold">Select Month:</label>
           <input
@@ -133,7 +133,7 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">Total Check-Ins</th>
                   <th className="border border-gray-300 px-4 py-2">Late Check-Ins</th>
                   <th className="border border-gray-300 px-4 py-2">Month</th>
-                  <th className="border border-gray-300 px-4 py-2">Year</th>
+                  <th className="border border-gray-300 px-4 py-2">Daily Report</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,8 +142,8 @@ const AdminDashboard = () => {
                     <td className="border border-gray-300 px-4 py-2">{report.username}</td>
                     <td className="border border-gray-300 px-4 py-2">{report.totalCheckIns}</td>
                     <td className="border border-gray-300 px-4 py-2">{report.lateCheckIns}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.month}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.year}</td>
+                    <td className="border border-gray-300 px-4 py-2">{dayjs(report.month).format("MMMM")}, {dayjs(report.year).format("YYYY")}</td>
+                    <td className="border border-gray-300 px-4 py-2">View Report</td>
                   </tr>
                 ))}
               </tbody>
