@@ -17,6 +17,8 @@ const HomePage = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  const currentMonth = dayjs().format("MMMM");
+  const currentYear = dayjs().format("YYYY");
 
   const fetchUserData = useCallback(async () => {
     if (!storedUser) return;
@@ -27,7 +29,7 @@ const HomePage = () => {
           `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?._id}`
         ),
         axios.get(
-          `https://attendance-app-server-blue.vercel.app/api/checkins/current-month/${storedUser?._id}`
+          `https://attendance-app-server-blue.vercel.app/api/checkins/${storedUser?._id}?month=${currentMonth}&year=${currentYear}`
         ),
       ]);
 
@@ -35,7 +37,7 @@ const HomePage = () => {
       const checkins = checkInsResponse.data;
 
       setUser(userData);
-      localStorage.setItem("user",JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userData));
       setTotalCheckIns(checkins.length);
 
       // Calculate late check-ins (after 10:15 AM)
@@ -104,11 +106,11 @@ const HomePage = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <SummaryCard
-            title="December Attendance"
+            title={`${currentMonth} Attendance`}
             value={dataLoading ? "Calculating..." : `${totalCheckIns} Days`}
           />
           <SummaryCard
-            title="December Late"
+            title={`${currentMonth} Late`}
             value={dataLoading ? "Calculating..." : `${lateCheckIns} Days`}
           />
           <SummaryCard
@@ -119,9 +121,7 @@ const HomePage = () => {
             title="Today's In Time"
             value={
               user?.checkIn
-                ? dayjs(user?.lastCheckedIn)
-                    .tz("Asia/Dhaka")
-                    .format("hh:mm A")
+                ? dayjs(user?.lastCheckedIn).tz("Asia/Dhaka").format("hh:mm A")
                 : "00:00:00"
             }
           />

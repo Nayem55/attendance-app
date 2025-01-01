@@ -5,6 +5,7 @@ import SignUpForm from "../Component/Signup";
 import HomePage from "../Pages/Homepage/Homepage";
 import CheckInPage from "../Pages/Checkin/Checkin";
 import Profile from "../Component/Profile";
+import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile/>,
+      },
+      {
+        path: "/admin",
+        element: <AdminDashboard/>,
       },
     ],
   },
