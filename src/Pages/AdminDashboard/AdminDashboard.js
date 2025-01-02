@@ -37,13 +37,7 @@ const AdminDashboard = () => {
           const totalCheckIns = checkIns.length;
 
           // Late check-ins calculation (after 10:15 AM)
-          const lateCheckInsCount = checkIns.filter((checkin) => {
-            const checkInTime = dayjs(checkin.time);
-            const lateThreshold = dayjs(
-              checkInTime.format("YYYY-MM-DD") + "10:15:00"
-            );
-            return checkInTime.isAfter(lateThreshold);
-          }).length;
+          const lateCheckInsCount = checkIns.filter((checkin) => checkin.status === "Late").length;
 
           return {
             username: user.name,

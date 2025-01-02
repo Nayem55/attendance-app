@@ -41,13 +41,14 @@ const HomePage = () => {
       setTotalCheckIns(checkins.length);
 
       // Calculate late check-ins (after 10:15 AM)
-      const lateCheckInsCount = checkins.filter((checkin) => {
-        const checkInTime = dayjs(checkin.time);
-        const lateThreshold = dayjs(
-          checkInTime.format("YYYY-MM-DD") + "10:15:00"
-        );
-        return checkInTime.isAfter(lateThreshold);
-      }).length;
+      // const lateCheckInsCount = checkins.filter((checkin) => {
+      //   const checkInTime = dayjs(checkin.time);
+      //   const lateThreshold = dayjs(
+      //     checkInTime.format("YYYY-MM-DD") + "10:15:00"
+      //   );
+      //   return checkInTime.isAfter(lateThreshold);
+      // }).length;
+      const lateCheckInsCount = checkins.filter((checkin) => checkin.status==="Late").length;
 
       setLateCheckIns(lateCheckInsCount);
       setIsCheckedIn(userData.checkIn && userData.lastCheckedIn);

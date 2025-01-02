@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const TodaysReport = () => {
   const [todaysReports, setTodaysReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); // For handling selected image
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [updatedStatuses, setUpdatedStatuses] = useState({}); // State to hold updated statuses
 
   useEffect(() => {
     fetchTodaysReports();
@@ -18,7 +20,7 @@ const TodaysReport = () => {
     setLoading(true);
     setError(null);
     try {
-      const today = dayjs().format("YYYY-MM-DD"); // Format to match date in check-in/check-out records
+      const today = dayjs().format("YYYY-MM-DD");
       const usersResponse = await axios.get(
         "https://attendance-app-server-blue.vercel.app/getAllUser"
       );
@@ -29,14 +31,14 @@ const TodaysReport = () => {
           const checkInsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkins/${user._id}`,
             {
-              params: { date: today }, // Filter for today's date
+              params: { date: today },
             }
           );
 
           const checkOutsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkouts/${user._id}`,
             {
-              params: { date: today }, // Filter for today's date
+              params: { date: today },
             }
           );
 
@@ -44,20 +46,18 @@ const TodaysReport = () => {
           const checkOuts = checkOutsResponse.data;
 
           if (checkIns.length === 0) {
-            return null; // No check-ins for this user today
+            return null;
           }
 
-          // Get the latest check-in time for the user
           const latestCheckIn = checkIns.find((checkin) =>
             dayjs(checkin.time).isBefore(dayjs().endOf("day"))
           );
 
-          // Get the latest check-out time for the user (if exists)
-          const latestCheckOut = checkOuts.find((checkout) =>
-            dayjs(checkout.time).isAfter(dayjs(latestCheckIn.time)) // Ensure checkout is after check-in
+          const latestCheckOut = checkOuts.find(
+            (checkout) =>
+              dayjs(checkout.time).isAfter(dayjs(latestCheckIn.time))
           );
 
-          // Calculate total work time (if both check-in and check-out exist)
           let totalWorkTime = "N/A";
           if (latestCheckIn && latestCheckOut) {
             const checkInTime = dayjs(latestCheckIn.time);
@@ -65,11 +65,14 @@ const TodaysReport = () => {
             const duration = dayjs.duration(checkOutTime.diff(checkInTime));
             totalWorkTime = `${duration.hours()}h ${duration.minutes()}m`;
           }
-
           return {
             username: user.name,
-            checkInTime: latestCheckIn ? dayjs(latestCheckIn.time).format("hh:mm A") : "N/A",
-            checkOutTime: latestCheckOut ? dayjs(latestCheckOut.time).format("hh:mm A") : "N/A",
+            checkInTime: latestCheckIn
+              ? dayjs(latestCheckIn.time).format("hh:mm A")
+              : "N/A",
+            checkOutTime: latestCheckOut
+              ? dayjs(latestCheckOut.time).format("hh:mm A")
+              : "N/A",
             totalWorkTime,
             checkInNote: latestCheckIn?.note || "N/A",
             checkInLocation: latestCheckIn?.location || "N/A",
@@ -77,17 +80,51 @@ const TodaysReport = () => {
             checkOutNote: latestCheckOut?.note || "N/A",
             checkOutLocation: latestCheckOut?.location || "N/A",
             checkOutImage: latestCheckOut?.image || null,
+            status: latestCheckIn?.status || "",
+            checkInId: latestCheckIn?._id || "",
+            checkOutId: latestCheckOut?._id || "",
           };
         })
       );
 
-      // Filter out users who have no check-ins (if no check-in, do not display)
       setTodaysReports(reportsData.filter((report) => report !== null));
     } catch (error) {
       console.error("Error fetching today's reports:", error);
       setError("Failed to load today's reports. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = (reportId, newStatus) => {
+    setUpdatedStatuses((prev) => ({
+      ...prev,
+      [reportId]: newStatus,
+    }));
+  };
+
+  const saveStatus = async (reportId) => {
+    try {
+      const newStatus = updatedStatuses[reportId];
+      if (!newStatus) return;
+      console.log(newStatus)
+
+      await axios.put(
+        `https://attendance-app-server-blue.vercel.app/api/update-status/${reportId}`,
+        { status: newStatus }
+      );
+
+      setTodaysReports((prevReports) =>
+        prevReports.map((report) =>
+          report.checkInId === reportId
+            ? { ...report, status: newStatus }
+            : report
+        )
+      );
+      toast.success("Status updated successfully");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status. Please try again.");
     }
   };
 
@@ -117,16 +154,28 @@ const TodaysReport = () => {
           </button>
         </div>
         <nav className="flex flex-col p-4 space-y-2">
-          <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Attendance Report
           </Link>
-          <Link to="/admin/todays-report" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/todays-report"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Today's Report
           </Link>
-          <Link to="/admin/users" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/users"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Users
           </Link>
-          <Link to="/admin/settings" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/settings"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Settings
           </Link>
         </nav>
@@ -153,26 +202,60 @@ const TodaysReport = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Total Work Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Note</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Location</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Image</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Note</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Location</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Image</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Total Work Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Image
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Image
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Attendance Status
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {todaysReports.map((report, index) => (
                   <tr key={index} className="text-center">
-                    <td className="border border-gray-300 px-4 py-2">{report.username}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkInTime}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkOutTime}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.totalWorkTime}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkInNote}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkInLocation}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.username}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkInTime}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkOutTime}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.totalWorkTime}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkInNote}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkInLocation}
+                    </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.checkInImage ? (
                         <img
@@ -185,8 +268,12 @@ const TodaysReport = () => {
                         "N/A"
                       )}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkOutNote}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.checkOutLocation}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkOutNote}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.checkOutLocation}
+                    </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.checkOutImage ? (
                         <img
@@ -198,6 +285,39 @@ const TodaysReport = () => {
                       ) : (
                         "N/A"
                       )}
+                    </td>
+                    <td
+                      className={`border border-gray-300 font-bold px-4 py-2 ${
+                        report.status === "Pending"
+                          ? "text-[#F16F24]"
+                          : (report.status === "Rejected" || report.status === "Late")
+                          ? "text-[#B7050E]"
+                          : "text-[#0DC143]"
+                      }`}
+                    >
+                      {report.status}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
+                      <select
+                        className="px-2 py-1"
+                        value={updatedStatuses[report.checkInId] || ""}
+                        onChange={(e) =>
+                          handleStatusChange(report.checkInId, e.target.value)
+                        }
+                      >
+                        <option value="">Update Status</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Success">Success</option>
+                        <option value="Late">Late</option>
+                      </select>
+                      <button
+                        onClick={() => saveStatus(report.checkInId)}
+                        className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
+                      >
+                        Save
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -215,7 +335,11 @@ const TodaysReport = () => {
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
           onClick={closeImageModal}
         >
-          <img src={selectedImage} alt="Selected" className="max-w-full max-h-full object-contain" />
+          <img
+            src={selectedImage}
+            alt="Selected"
+            className="max-w-full max-h-full object-contain"
+          />
         </div>
       )}
     </div>

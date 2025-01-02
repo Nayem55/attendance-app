@@ -148,9 +148,14 @@ const CheckInPage = () => {
   const handleCheckIn = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const checkInTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
-
-    setLoading(true); // Set loading state to true while submitting check-in
-
+    const checkInHour = dayjs(checkInTime).hour();
+    const checkInMinute = dayjs(checkInTime).minute();
+  
+    setLoading(true); 
+  
+    // Determine the status based on check-in time
+    const status = checkInHour > 10 || (checkInHour === 10 && checkInMinute > 15) ? "Late" : "Success";
+  
     try {
       const response = await axios.post(
         "https://attendance-app-server-blue.vercel.app/checkin",
@@ -159,15 +164,15 @@ const CheckInPage = () => {
           note,
           image,
           time: checkInTime,
-          date: "",
-          // location,
+          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"), // Add today's date
+          status, // Include the status
+          // location, // Uncomment and implement if location is needed
         }
       );
-
+  
       user.checkIn = true;
-      // user.checkInTime = checkInTime;
       localStorage.setItem("user", JSON.stringify(user));
-
+  
       toast.success(response.data.message);
       navigate("/home");
     } catch (error) {
@@ -178,6 +183,7 @@ const CheckInPage = () => {
       setLoading(false); // Set loading state back to false after submission
     }
   };
+  
 
   const handleCheckOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
