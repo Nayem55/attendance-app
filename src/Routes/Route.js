@@ -7,6 +7,7 @@ import CheckInPage from "../Pages/Checkin/Checkin";
 import Profile from "../Component/Profile";
 import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
 import TodaysReport from "../Pages/AdminDashboard/TodaysReport";
+import ViewReport from "../Pages/AdminDashboard/ViewReport";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/today-report",
         element: <TodaysReport/>,
+      },
+      {
+        path: "/admin/view-report/:userId",
+        element: <ViewReport/>,
       },
     ],
   },

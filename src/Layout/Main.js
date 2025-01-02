@@ -13,7 +13,7 @@ const Main = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center p-4 bg-[#ffffff]">
+      <div className="flex top-0 justify-between items-center p-4 bg-[#ffffff]">
         <Link to="/">
           {" "}
           <img className="w-[60px]" src={logo} alt="" />

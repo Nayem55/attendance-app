@@ -10,17 +10,17 @@ const TodaysReport = () => {
   const [error, setError] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [updatedStatuses, setUpdatedStatuses] = useState({}); // State to hold updated statuses
+  const [updatedStatuses, setUpdatedStatuses] = useState({});
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD")); // State for selected date
 
   useEffect(() => {
-    fetchTodaysReports();
-  }, []);
+    fetchReports(selectedDate);
+  }, [selectedDate]);
 
-  const fetchTodaysReports = async () => {
+  const fetchReports = async (date) => {
     setLoading(true);
     setError(null);
     try {
-      const today = dayjs().format("YYYY-MM-DD");
       const usersResponse = await axios.get(
         "https://attendance-app-server-blue.vercel.app/getAllUser"
       );
@@ -31,14 +31,14 @@ const TodaysReport = () => {
           const checkInsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkins/${user._id}`,
             {
-              params: { date: today },
+              params: { date },
             }
           );
 
           const checkOutsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkouts/${user._id}`,
             {
-              params: { date: today },
+              params: { date },
             }
           );
 
@@ -50,7 +50,7 @@ const TodaysReport = () => {
           }
 
           const latestCheckIn = checkIns.find((checkin) =>
-            dayjs(checkin.time).isBefore(dayjs().endOf("day"))
+            dayjs(checkin.time).isBefore(dayjs(date).endOf("day"))
           );
 
           const latestCheckOut = checkOuts.find(
@@ -65,6 +65,7 @@ const TodaysReport = () => {
             const duration = dayjs.duration(checkOutTime.diff(checkInTime));
             totalWorkTime = `${duration.hours()}h ${duration.minutes()}m`;
           }
+
           return {
             username: user.name,
             checkInTime: latestCheckIn
@@ -89,8 +90,8 @@ const TodaysReport = () => {
 
       setTodaysReports(reportsData.filter((report) => report !== null));
     } catch (error) {
-      console.error("Error fetching today's reports:", error);
-      setError("Failed to load today's reports. Please try again.");
+      console.error("Error fetching reports:", error);
+      setError("Failed to load reports. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +108,6 @@ const TodaysReport = () => {
     try {
       const newStatus = updatedStatuses[reportId];
       if (!newStatus) return;
-      console.log(newStatus)
 
       await axios.put(
         `https://attendance-app-server-blue.vercel.app/api/update-status/${reportId}`,
@@ -167,13 +167,13 @@ const TodaysReport = () => {
             Today's Report
           </Link>
           <Link
-            to="/admin/users"
+            to="/admin"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Users
           </Link>
           <Link
-            to="/admin/settings"
+            to="/admin"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Settings
@@ -191,6 +191,19 @@ const TodaysReport = () => {
         </button>
 
         <h1 className="text-xl font-bold mb-4">Today's Report</h1>
+
+        {/* Date Filter */}
+        <div className="mb-4">
+          <label className="block text-gray-700 font-bold mb-2">
+            Select Date:
+          </label>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/3"
+          />
+        </div>
 
         {loading ? (
           <p>Loading...</p>
@@ -290,7 +303,8 @@ const TodaysReport = () => {
                       className={`border border-gray-300 font-bold px-4 py-2 ${
                         report.status === "Pending"
                           ? "text-[#F16F24]"
-                          : (report.status === "Rejected" || report.status === "Late")
+                          : (report.status === "Rejected" ||
+                              report.status === "Late")
                           ? "text-[#B7050E]"
                           : "text-[#0DC143]"
                       }`}
@@ -325,7 +339,7 @@ const TodaysReport = () => {
             </table>
           </div>
         ) : (
-          <p className="text-gray-500">No check-ins or check-outs today.</p>
+          <p className="text-gray-500">No check-ins or check-outs for the selected date.</p>
         )}
       </div>
 
