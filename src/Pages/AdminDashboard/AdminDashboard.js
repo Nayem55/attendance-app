@@ -38,11 +38,13 @@ const AdminDashboard = () => {
 
           // Late check-ins calculation (after 10:15 AM)
           const lateCheckInsCount = checkIns.filter((checkin) => checkin.status === "Late").length;
+          const AbsentCount = checkIns.filter((checkin) => checkin.status === "Absent").length;
 
           return {
             username: user.name,
             userId:user._id,
             totalCheckIns,
+            AbsentCount,
             lateCheckIns: lateCheckInsCount,
             month: monthNumber,
             year: year,
@@ -124,6 +126,7 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Total Check-Ins</th>
                   <th className="border border-gray-300 px-4 py-2">Late Check-Ins</th>
+                  <th className="border border-gray-300 px-4 py-2">Absent</th>
                   <th className="border border-gray-300 px-4 py-2">Month</th>
                   <th className="border border-gray-300 px-4 py-2">Daily Report</th>
                 </tr>
@@ -132,8 +135,9 @@ const AdminDashboard = () => {
                 {reports.map((report, index) => (
                   <tr key={index} className="text-center">
                     <td className="border border-gray-300 px-4 py-2">{report.username}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.totalCheckIns}</td>
+                    <td className="border border-gray-300 px-4 py-2">{report.totalCheckIns-report.AbsentCount}</td>
                     <td className="border border-gray-300 px-4 py-2">{report.lateCheckIns}</td>
+                    <td className="border border-gray-300 px-4 py-2">{report.AbsentCount}</td>
                     <td className="border border-gray-300 px-4 py-2">{dayjs(report.month).format("MMMM")}, {dayjs(report.year).format("YYYY")}</td>
                     <td className="border border-gray-300 px-4 py-2"><Link to={`/admin/view-report/${report.userId}`}>View Report</Link></td>
                   </tr>
