@@ -119,7 +119,7 @@ const AdminDashboard = () => {
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : reports.length > 0 ? (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto w-[95vw] sm:w-[auto]">
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
