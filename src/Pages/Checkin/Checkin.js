@@ -27,11 +27,29 @@ const CheckInPage = () => {
     const currentTime = dayjs().tz("Asia/Dhaka").format("hh:mm A");
     setTime(currentTime);
   };
-    useEffect(() => {
-      if (!user) {
-        navigate("/login");
-      } 
-    }, []);
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, []);
+
+  const fetchUserLocation = async () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            reject("Unable to fetch location. Please enable location access.");
+          }
+        );
+      } else {
+        reject("Geolocation is not supported by your browser.");
+      }
+    });
+  };
 
   useEffect(() => {
     // if (storedUser) {
@@ -150,12 +168,18 @@ const CheckInPage = () => {
     const checkInTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
     const checkInHour = dayjs(checkInTime).hour();
     const checkInMinute = dayjs(checkInTime).minute();
-  
-    setLoading(true); 
-  
+
+    // Get user's location (lat, lng)
+    const location = await fetchUserLocation();
+
+    setLoading(true);
+
     // Determine the status based on check-in time
-    const status = checkInHour > 10 || (checkInHour === 10 && checkInMinute > 15) ? "Late" : "Success";
-  
+    const status =
+      checkInHour > 10 || (checkInHour === 10 && checkInMinute > 15)
+        ? "Late"
+        : "Success";
+
     try {
       const response = await axios.post(
         "https://attendance-app-server-blue.vercel.app/checkin",
@@ -166,13 +190,14 @@ const CheckInPage = () => {
           time: checkInTime,
           date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"), // Add today's date
           status, // Include the status
-          // location, // Uncomment and implement if location is needed
+          location, // Include location (lat and lng)
         }
       );
-  
+
+      // Update the user’s check-in status
       user.checkIn = true;
       localStorage.setItem("user", JSON.stringify(user));
-  
+
       toast.success(response.data.message);
       navigate("/home");
     } catch (error) {
@@ -183,11 +208,13 @@ const CheckInPage = () => {
       setLoading(false); // Set loading state back to false after submission
     }
   };
-  
 
   const handleCheckOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const checkOutTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
+
+    // Get user's location (lat, lng) at the time of checkout
+    const location = await fetchUserLocation();
 
     setLoading(true); // Set loading state to true while submitting check-out
 
@@ -199,13 +226,13 @@ const CheckInPage = () => {
           note,
           image,
           time: checkOutTime,
-          date: "",
-          // location,
+          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"), // Add today's date
+          location, // Include location (lat and lng)
         }
       );
 
       user.checkIn = false;
-      // user.checkOutTime = checkOutTime;
+      // user.checkOutTime = checkOutTime; // Uncomment if you want to store checkout time
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success(response.data.message);
@@ -299,7 +326,7 @@ const CheckInPage = () => {
             onClick={handleCheckIn}
             disabled={loading} // Disable button while loading
           >
-            {(loading) ? "Please wait..." : "Check In"}
+            {loading ? "Please wait..." : "Check In"}
           </button>
         )}
       </div>

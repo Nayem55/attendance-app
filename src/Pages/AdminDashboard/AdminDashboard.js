@@ -86,11 +86,8 @@ const AdminDashboard = () => {
           <Link to="/admin/today-report" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
             Today's Report
           </Link>
-          <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
-            Users
-          </Link>
-          <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
-            Settings
+          <Link to="/admin/holiday-management" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+            Holiday
           </Link>
         </nav>
       </div>

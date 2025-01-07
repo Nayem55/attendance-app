@@ -12,6 +12,7 @@ const TodaysReport = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [updatedStatuses, setUpdatedStatuses] = useState({});
   const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD")); // State for selected date
+  console.log(selectedDate)
 
   useEffect(() => {
     fetchReports(selectedDate);
@@ -68,6 +69,7 @@ const TodaysReport = () => {
 
           return {
             username: user.name,
+            number: user.number,
             checkInTime: latestCheckIn
               ? dayjs(latestCheckIn.time).format("hh:mm A")
               : "N/A",
@@ -96,7 +98,7 @@ const TodaysReport = () => {
       setLoading(false);
     }
   };
-
+console.log(todaysReports)
   const handleStatusChange = (reportId, newStatus) => {
     setUpdatedStatuses((prev) => ({
       ...prev,
@@ -161,22 +163,16 @@ const TodaysReport = () => {
             Attendance Report
           </Link>
           <Link
-            to="/admin/todays-report"
+            to="/admin/today-report"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Today's Report
           </Link>
           <Link
-            to="/admin"
+            to="/admin/holiday-management"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
-            Users
-          </Link>
-          <Link
-            to="/admin"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Settings
+            Holiday
           </Link>
         </nav>
       </div>
@@ -215,6 +211,7 @@ const TodaysReport = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
+                  <th className="border border-gray-300 px-4 py-2">Phone</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Check-in Time
                   </th>
@@ -255,7 +252,10 @@ const TodaysReport = () => {
                       {report.username}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkInTime}
+                      {report.number}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report?.status!=="Absent" && report.checkInTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.checkOutTime}
@@ -304,7 +304,8 @@ const TodaysReport = () => {
                         report.status === "Pending"
                           ? "text-[#F16F24]"
                           : (report.status === "Rejected" ||
-                              report.status === "Late")
+                              report.status === "Late"||
+                              report.status === "Absent")
                           ? "text-[#B7050E]"
                           : "text-[#0DC143]"
                       }`}
@@ -320,9 +321,10 @@ const TodaysReport = () => {
                         }
                       >
                         <option value="">Update Status</option>
-                        <option value="Approved">Approved</option>
+                        <option value="Approved Late">Approved Late</option>
                         <option value="Rejected">Rejected</option>
                         <option value="Pending">Pending</option>
+                        <option value="Approved Leave">Approved Leave</option>
                         <option value="Success">Success</option>
                         <option value="Late">Late</option>
                       </select>

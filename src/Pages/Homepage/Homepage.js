@@ -15,6 +15,7 @@ const HomePage = () => {
   const [lateCheckIns, setLateCheckIns] = useState(0);
   const [user, setUser] = useState({});
   const [dataLoading, setDataLoading] = useState(false);
+  const [AbsentCount, setAbsentCount] = useState(0);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const currentMonth = dayjs().format("MMMM");
@@ -49,8 +50,10 @@ const HomePage = () => {
       //   return checkInTime.isAfter(lateThreshold);
       // }).length;
       const lateCheckInsCount = checkins.filter((checkin) => checkin.status==="Late").length;
+      const AbsentCount = checkins.filter((checkin) => checkin.status==="Absent").length;
 
       setLateCheckIns(lateCheckInsCount);
+      setAbsentCount(AbsentCount)
       setIsCheckedIn(userData.checkIn && userData.lastCheckedIn);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -108,22 +111,26 @@ const HomePage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <SummaryCard
             title={`${currentMonth} Attendance`}
-            value={dataLoading ? "Calculating..." : `${totalCheckIns} Days`}
+            value={dataLoading ? "Calculating..." : `${totalCheckIns-AbsentCount} Days`}
           />
           <SummaryCard
             title={`${currentMonth} Late`}
             value={dataLoading ? "Calculating..." : `${lateCheckIns} Days`}
           />
           <SummaryCard
+            title={`${currentMonth} Absent`}
+            value={AbsentCount}
+          />
+          {/* <SummaryCard
             title="Today's Status"
             value={user?.checkIn ? "Checked In" : "Not Checked In"}
-          />
+          /> */}
           <SummaryCard
             title="Today's In Time"
             value={
               user?.checkIn
                 ? dayjs(user?.lastCheckedIn).tz("Asia/Dhaka").format("hh:mm A")
-                : "00:00:00"
+                : "Not Checked In"
             }
           />
         </div>

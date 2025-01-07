@@ -8,6 +8,7 @@ import Profile from "../Component/Profile";
 import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
 import TodaysReport from "../Pages/AdminDashboard/TodaysReport";
 import ViewReport from "../Pages/AdminDashboard/ViewReport";
+import HolidayManagement from "../Pages/AdminDashboard/HolidayManagement";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/view-report/:userId",
         element: <ViewReport/>,
+      },
+      {
+        path: "/admin/holiday-management",
+        element: <HolidayManagement/>,
       },
     ],
   },
