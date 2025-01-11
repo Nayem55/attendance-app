@@ -12,7 +12,6 @@ const ViewReport = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     fetchUserReport(selectedMonth);
   }, [selectedMonth]);
@@ -26,7 +25,7 @@ const ViewReport = () => {
         `https://attendance-app-server-blue.vercel.app/getUser/${userId}`
       );
       setUserName(userResponse.data.name);
-  
+
       // Fetch check-ins
       const checkInsResponse = await axios.get(
         `https://attendance-app-server-blue.vercel.app/api/checkins/${userId}`,
@@ -35,7 +34,7 @@ const ViewReport = () => {
         }
       );
       const checkIns = checkInsResponse.data;
-  
+
       // Fetch check-outs
       const checkOutsResponse = await axios.get(
         `https://attendance-app-server-blue.vercel.app/api/checkouts/${userId}`,
@@ -44,11 +43,11 @@ const ViewReport = () => {
         }
       );
       const checkOuts = checkOutsResponse.data;
-  
+
       // Combine check-ins and check-outs based on date
       const combinedRecords = checkIns.map((checkIn) => {
-        const checkOut = checkOuts.find(
-          (co) => dayjs(co.time).isSame(checkIn.time, "day")
+        const checkOut = checkOuts.find((co) =>
+          dayjs(co.time).isSame(checkIn.time, "day")
         );
         return {
           date: dayjs(checkIn?.time).format("DD MMMM YYYY"),
@@ -57,7 +56,7 @@ const ViewReport = () => {
           status: checkIn.status,
         };
       });
-  
+
       setRecords(combinedRecords);
     } catch (error) {
       console.error("Error fetching user report:", error);
@@ -66,12 +65,10 @@ const ViewReport = () => {
       setLoading(false);
     }
   };
-  
 
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
   };
-
 
   return (
     <div className="flex">
@@ -91,14 +88,29 @@ const ViewReport = () => {
           </button>
         </div>
         <nav className="flex flex-col p-4 space-y-2">
-          <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Attendance Report
           </Link>
-          <Link to="/admin/today-report" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/today-report"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Today's Report
           </Link>
-          <Link to="/admin/holiday-management" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/holiday-management"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Holiday
+          </Link>
+          <Link
+            to="/admin/applications"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
+            Leave Requests
           </Link>
         </nav>
       </div>
@@ -112,7 +124,9 @@ const ViewReport = () => {
           {isDrawerOpen ? "Close Menu" : "Open Menu"}
         </button>
 
-        <h1 className="text-xl font-bold mb-4">Monthly Report for {userName}</h1>
+        <h1 className="text-xl font-bold mb-4">
+          Monthly Report for {userName}
+        </h1>
         <div className="mb-4">
           <label className="mr-2 font-semibold">Select Month:</label>
           <input
@@ -134,21 +148,33 @@ const ViewReport = () => {
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Date</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-In Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-Out Time</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-In Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-Out Time
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {records.map((record, index) => (
                   <tr key={index} className="text-center">
-                    <td className="border border-gray-300 px-4 py-2">{userName}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {userName}
+                    </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {record.date}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">{record.checkInTime}</td>
-                    <td className="border border-gray-300 px-4 py-2">{record.checkOutTime || "N/A"}</td>
-                    <td className="border border-gray-300 px-4 py-2">{record.status}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {record.checkInTime}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {record.checkOutTime || "N/A"}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {record.status}
+                    </td>
                   </tr>
                 ))}
               </tbody>

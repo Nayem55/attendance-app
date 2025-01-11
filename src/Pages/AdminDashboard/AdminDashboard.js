@@ -9,11 +9,60 @@ const AdminDashboard = () => {
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [totalWorkingDays, setTotalWorkingDays] = useState(null);
+  const [pendingReq, setPendingReq] = useState(0);
 
   useEffect(() => {
+    fetchWorkingDays(selectedMonth);
     fetchUserReports(selectedMonth);
+    fetchPendingRequest();
   }, [selectedMonth]);
 
+  const fetchPendingRequest = async () => {
+    try {
+      const response = await axios.get(
+        `https://attendance-app-server-blue.vercel.app/api/pending-requests`
+      );
+      setPendingReq(response.data.pendingCount);
+    } catch (error) {
+      console.error("Error fetching pending requests:", error);
+      setPendingReq(0);
+    }
+  };
+
+  const fetchWorkingDays = async (month) => {
+    try {
+      const response = await axios.get(
+        `https://attendance-app-server-blue.vercel.app/api/workingdays`,
+        {
+          params: { month },
+        }
+      );
+      const { workingDays } = response.data;
+      setTotalWorkingDays(workingDays);
+    } catch (error) {
+      console.error("Error fetching working days:", error);
+      setTotalWorkingDays(null);
+    }
+  };
+
+  const fetchApprovedLeaves = async (userId, month, year) => {
+    try {
+      const response = await axios.get(
+        `https://attendance-app-server-blue.vercel.app/api/leave-requests/user/${userId}/monthly`,
+        {
+          params: { month, year },
+        }
+      );
+      const { leaveDays } = response.data;
+      return leaveDays || 0;
+    } catch (error) {
+      console.error(`Error fetching approved leaves for user ${userId}:`, error);
+      return 0;
+    }
+  };
+  
+  
   const fetchUserReports = async (month) => {
     setLoading(true);
     setError(null);
@@ -38,14 +87,16 @@ const AdminDashboard = () => {
 
           // Late check-ins calculation (after 10:15 AM)
           const lateCheckInsCount = checkIns.filter((checkin) => checkin.status === "Late").length;
-          const AbsentCount = checkIns.filter((checkin) => checkin.status === "Absent").length;
+
+          // Fetch approved leave days for the user in the selected month
+          const approvedLeaveDays = await fetchApprovedLeaves(user._id, monthNumber, year);
 
           return {
             username: user.name,
-            userId:user._id,
+            userId: user._id,
             totalCheckIns,
-            AbsentCount,
             lateCheckIns: lateCheckInsCount,
+            approvedLeaves: approvedLeaveDays,
             month: monthNumber,
             year: year,
           };
@@ -63,7 +114,7 @@ const AdminDashboard = () => {
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
   };
-  
+
   return (
     <div className="flex">
       {/* Side Drawer */}
@@ -90,6 +141,9 @@ const AdminDashboard = () => {
           </Link>
           <Link to="/admin/holiday-management" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
             Holiday
+          </Link>
+          <Link to="/admin/applications" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center">
+            Leave Requests <span className="ml-2 font-bold text-[#F16F24]">{pendingReq > 0 && pendingReq}</span>
           </Link>
         </nav>
       </div>
@@ -127,6 +181,7 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">Total Check-Ins</th>
                   <th className="border border-gray-300 px-4 py-2">Late Check-Ins</th>
                   <th className="border border-gray-300 px-4 py-2">Absent</th>
+                  <th className="border border-gray-300 px-4 py-2">Approved Leave</th>
                   <th className="border border-gray-300 px-4 py-2">Month</th>
                   <th className="border border-gray-300 px-4 py-2">Daily Report</th>
                 </tr>
@@ -135,11 +190,18 @@ const AdminDashboard = () => {
                 {reports.map((report, index) => (
                   <tr key={index} className="text-center">
                     <td className="border border-gray-300 px-4 py-2">{report.username}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.totalCheckIns-report.AbsentCount}</td>
+                    <td className="border border-gray-300 px-4 py-2">{report.totalCheckIns}</td>
                     <td className="border border-gray-300 px-4 py-2">{report.lateCheckIns}</td>
-                    <td className="border border-gray-300 px-4 py-2">{report.AbsentCount}</td>
-                    <td className="border border-gray-300 px-4 py-2">{dayjs(report.month).format("MMMM")}, {dayjs(report.year).format("YYYY")}</td>
-                    <td className="border border-gray-300 px-4 py-2"><Link to={`/admin/view-report/${report.userId}`}>View Report</Link></td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {totalWorkingDays ? totalWorkingDays - report.totalCheckIns - report.approvedLeaves : "N/A"}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">{report.approvedLeaves}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {dayjs(report.month).format("MMMM")}, {dayjs(report.year).format("YYYY")}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <Link to={`/admin/view-report/${report.userId}`}>View Report</Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

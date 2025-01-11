@@ -9,6 +9,9 @@ import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
 import TodaysReport from "../Pages/AdminDashboard/TodaysReport";
 import ViewReport from "../Pages/AdminDashboard/ViewReport";
 import HolidayManagement from "../Pages/AdminDashboard/HolidayManagement";
+import LeaveRequestPage from "../Pages/LeaveRequestPage";
+import HistoryPage from "../Pages/HistoryPage";
+import ApplicationsPage from "../Pages/AdminDashboard/ApplicationsPage";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +47,14 @@ const router = createBrowserRouter([
         element: <Profile/>,
       },
       {
+        path: "/leave-request",
+        element: <LeaveRequestPage/>,
+      },
+      {
+        path: "/leave-history",
+        element: <HistoryPage/>,
+      },
+      {
         path: "/admin",
         element: <AdminDashboard/>,
       },
@@ -58,6 +69,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/holiday-management",
         element: <HolidayManagement/>,
+      },
+      {
+        path: "/admin/applications",
+        element: <ApplicationsPage/>,
       },
     ],
   },

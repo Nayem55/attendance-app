@@ -10,8 +10,11 @@ const HolidayPage = () => {
   const [editHoliday, setEditHoliday] = useState(null); // To store the holiday being edited
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const yesterday = dayjs().tz("Asia/Dhaka").subtract(1, 'day').format("YYYY-MM-DD")
-  console.log(yesterday)
+  const yesterday = dayjs()
+    .tz("Asia/Dhaka")
+    .subtract(1, "day")
+    .format("YYYY-MM-DD");
+  console.log(yesterday);
 
   useEffect(() => {
     fetchHolidays();
@@ -20,7 +23,9 @@ const HolidayPage = () => {
   const fetchHolidays = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://attendance-app-server-blue.vercel.app/api/holidays");
+      const response = await axios.get(
+        "https://attendance-app-server-blue.vercel.app/api/holidays"
+      );
       setHolidays(response.data);
     } catch (error) {
       console.error("Error fetching holidays:", error);
@@ -31,7 +36,10 @@ const HolidayPage = () => {
 
   const addHoliday = async () => {
     try {
-      await axios.post("https://attendance-app-server-blue.vercel.app/api/holidays", newHoliday);
+      await axios.post(
+        "https://attendance-app-server-blue.vercel.app/api/holidays",
+        newHoliday
+      );
       toast.success("Holiday added successfully");
       setNewHoliday({ date: "", name: "" });
       fetchHolidays();
@@ -43,7 +51,9 @@ const HolidayPage = () => {
 
   const deleteHoliday = async (holidayId) => {
     try {
-      await axios.delete(`https://attendance-app-server-blue.vercel.app/api/holidays/${holidayId}`);
+      await axios.delete(
+        `https://attendance-app-server-blue.vercel.app/api/holidays/${holidayId}`
+      );
       toast.success("Holiday deleted successfully");
       fetchHolidays();
     } catch (error) {
@@ -58,7 +68,10 @@ const HolidayPage = () => {
 
   const saveHolidayChanges = async () => {
     try {
-      await axios.put(`https://attendance-app-server-blue.vercel.app/api/holidays/${editHoliday._id}`, editHoliday);
+      await axios.put(
+        `https://attendance-app-server-blue.vercel.app/api/holidays/${editHoliday._id}`,
+        editHoliday
+      );
       toast.success("Holiday updated successfully");
       setEditHoliday(null); // Close modal
       fetchHolidays();
@@ -104,6 +117,12 @@ const HolidayPage = () => {
           >
             Holidays
           </Link>
+          <Link
+            to="/admin/applications"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
+            Leave Requests
+          </Link>
         </nav>
       </div>
 
@@ -119,7 +138,9 @@ const HolidayPage = () => {
         <h1 className="text-xl font-bold mb-4">Holiday Management</h1>
 
         <div className="mb-6">
-          <label className="block text-gray-700 font-bold mb-2">Holiday Name:</label>
+          <label className="block text-gray-700 font-bold mb-2">
+            Holiday Name:
+          </label>
           <input
             type="text"
             value={newHoliday.name}
@@ -129,7 +150,9 @@ const HolidayPage = () => {
             className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/2"
           />
 
-          <label className="block text-gray-700 font-bold mt-4 mb-2">Holiday Date:</label>
+          <label className="block text-gray-700 font-bold mt-4 mb-2">
+            Holiday Date:
+          </label>
           <input
             type="date"
             value={newHoliday.date}
@@ -153,7 +176,9 @@ const HolidayPage = () => {
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-4 py-2">Holiday Name</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Holiday Name
+                </th>
                 <th className="border border-gray-300 px-4 py-2">Date</th>
                 <th className="border border-gray-300 px-4 py-2">Actions</th>
               </tr>
@@ -193,7 +218,9 @@ const HolidayPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
             <h2 className="text-lg font-bold mb-4">Edit Holiday</h2>
-            <label className="block text-gray-700 font-bold mb-2">Holiday Name:</label>
+            <label className="block text-gray-700 font-bold mb-2">
+              Holiday Name:
+            </label>
             <input
               type="text"
               value={editHoliday.name}
@@ -203,7 +230,9 @@ const HolidayPage = () => {
               className="border border-gray-300 rounded px-3 py-2 w-full"
             />
 
-            <label className="block text-gray-700 font-bold mt-4 mb-2">Holiday Date:</label>
+            <label className="block text-gray-700 font-bold mt-4 mb-2">
+              Holiday Date:
+            </label>
             <input
               type="date"
               value={editHoliday.date}

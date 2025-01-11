@@ -11,8 +11,10 @@ const TodaysReport = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [updatedStatuses, setUpdatedStatuses] = useState({});
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD")); // State for selected date
-  console.log(selectedDate)
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  ); // State for selected date
+  console.log(selectedDate);
 
   useEffect(() => {
     fetchReports(selectedDate);
@@ -54,9 +56,8 @@ const TodaysReport = () => {
             dayjs(checkin.time).isBefore(dayjs(date).endOf("day"))
           );
 
-          const latestCheckOut = checkOuts.find(
-            (checkout) =>
-              dayjs(checkout.time).isAfter(dayjs(latestCheckIn.time))
+          const latestCheckOut = checkOuts.find((checkout) =>
+            dayjs(checkout.time).isAfter(dayjs(latestCheckIn.time))
           );
 
           let totalWorkTime = "N/A";
@@ -98,7 +99,7 @@ const TodaysReport = () => {
       setLoading(false);
     }
   };
-console.log(todaysReports)
+  console.log(todaysReports);
   const handleStatusChange = (reportId, newStatus) => {
     setUpdatedStatuses((prev) => ({
       ...prev,
@@ -173,6 +174,12 @@ console.log(todaysReports)
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Holiday
+          </Link>
+          <Link
+            to="/admin/applications"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
+            Leave Requests
           </Link>
         </nav>
       </div>
@@ -255,7 +262,7 @@ console.log(todaysReports)
                       {report.number}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report?.status!=="Absent" && report.checkInTime}
+                      {report?.status !== "Absent" && report.checkInTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.checkOutTime}
@@ -303,9 +310,9 @@ console.log(todaysReports)
                       className={`border border-gray-300 font-bold px-4 py-2 ${
                         report.status === "Pending"
                           ? "text-[#F16F24]"
-                          : (report.status === "Rejected" ||
-                              report.status === "Late"||
-                              report.status === "Absent")
+                          : report.status === "Rejected" ||
+                            report.status === "Late" ||
+                            report.status === "Absent"
                           ? "text-[#B7050E]"
                           : "text-[#0DC143]"
                       }`}
@@ -341,7 +348,9 @@ console.log(todaysReports)
             </table>
           </div>
         ) : (
-          <p className="text-gray-500">No check-ins or check-outs for the selected date.</p>
+          <p className="text-gray-500">
+            No check-ins or check-outs for the selected date.
+          </p>
         )}
       </div>
 

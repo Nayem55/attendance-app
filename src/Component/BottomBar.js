@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import application from "../Images/application-icon.png"
 
 const BottomBar = () => {
   const navigate = useNavigate();
@@ -58,6 +59,15 @@ const BottomBar = () => {
           />
         </svg>
         <span className="text-sm font-semibold">Profile</span>
+      </button>
+    
+      {/* Application Button */}
+      <button
+        onClick={() => navigate("/leave-request")}
+        className="flex flex-col items-center text-[#ffffff] hover:text-[#ffffff] focus:outline-none"
+      >
+        <img className="w-5 h-5" alt="" src={application}/>
+        <span className="text-sm font-semibold">Application</span>
       </button>
     </div>
   );

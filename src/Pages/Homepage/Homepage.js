@@ -117,20 +117,20 @@ const HomePage = () => {
             title={`${currentMonth} Late`}
             value={dataLoading ? "Calculating..." : `${lateCheckIns} Days`}
           />
-          <SummaryCard
+          {/* <SummaryCard
             title={`${currentMonth} Absent`}
             value={AbsentCount}
-          />
-          {/* <SummaryCard
+          /> */}
+          <SummaryCard
             title="Today's Status"
             value={user?.checkIn ? "Checked In" : "Not Checked In"}
-          /> */}
+          />
           <SummaryCard
             title="Today's In Time"
             value={
               user?.checkIn
                 ? dayjs(user?.lastCheckedIn).tz("Asia/Dhaka").format("hh:mm A")
-                : "Not Checked In"
+                : "00:00:00"
             }
           />
         </div>
