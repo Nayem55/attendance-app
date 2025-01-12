@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
@@ -35,21 +36,42 @@ const CheckInPage = () => {
 
   const fetchUserLocation = async () => {
     return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            reject("Unable to fetch location. Please enable location access.");
-          }
-        );
-      } else {
+      if (!navigator.geolocation) {
         reject("Geolocation is not supported by your browser.");
+        return;
       }
+  
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          resolve({ latitude, longitude });
+        },
+        (error) => {
+          // Map error codes to meaningful messages
+          let errorMessage = "An unknown error occurred.";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Location access denied. Please allow location permissions.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information is unavailable.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Request timed out. Please try again.";
+              break;
+          }
+          reject(errorMessage);
+        },
+        {
+          enableHighAccuracy: true, // Use GPS for better accuracy
+          timeout: 10000, // 10-second timeout
+          maximumAge: 0, // Do not use cached position
+        }
+      );
     });
   };
+  
+
 
   useEffect(() => {
     // if (storedUser) {
@@ -164,6 +186,7 @@ const CheckInPage = () => {
   };
 
   const handleCheckIn = async () => {
+    setLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
     const checkInTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
     const checkInHour = dayjs(checkInTime).hour();
@@ -171,8 +194,6 @@ const CheckInPage = () => {
 
     // Get user's location (lat, lng)
     const location = await fetchUserLocation();
-
-    setLoading(true);
 
     // Determine the status based on check-in time
     const status =
