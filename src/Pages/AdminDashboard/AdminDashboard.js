@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
@@ -11,6 +11,14 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [totalWorkingDays, setTotalWorkingDays] = useState(null);
   const [pendingReq, setPendingReq] = useState(0);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+      if (!storedUser) {
+        navigate("/login");
+      }
+    }, []);
 
   useEffect(() => {
     fetchWorkingDays(selectedMonth);
@@ -102,6 +110,7 @@ const AdminDashboard = () => {
           return {
             username: user.name,
             number: user.number,
+            role: user.role,
             userId: user._id,
             totalCheckIns,
             lateCheckIns: lateCheckInsCount,
@@ -203,6 +212,7 @@ const AdminDashboard = () => {
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Phone</th>
+                  <th className="border border-gray-300 px-4 py-2">Role</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Total Working Days
                   </th>
@@ -231,6 +241,9 @@ const AdminDashboard = () => {
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.number}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report?.role}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {totalWorkingDays}

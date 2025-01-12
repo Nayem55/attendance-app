@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const TodaysReport = () => {
@@ -14,7 +14,14 @@ const TodaysReport = () => {
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("YYYY-MM-DD")
   ); // State for selected date
-  console.log(selectedDate);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+      if (!storedUser) {
+        navigate("/login");
+      }
+    }, []);
 
   useEffect(() => {
     fetchReports(selectedDate);

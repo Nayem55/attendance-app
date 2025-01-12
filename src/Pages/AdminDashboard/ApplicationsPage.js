@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ApplicationsPage = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+      if (!storedUser) {
+        navigate("/login");
+      }
+    }, []);
 
   useEffect(() => {
     const fetchApplications = async () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const ViewReport = () => {
   const { userId } = useParams(); // Fetch userId from route params
@@ -11,6 +11,14 @@ const ViewReport = () => {
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+      if (!storedUser) {
+        navigate("/login");
+      }
+    }, []);
 
   useEffect(() => {
     fetchUserReport(selectedMonth);

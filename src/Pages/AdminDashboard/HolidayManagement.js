@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
@@ -14,7 +14,14 @@ const HolidayPage = () => {
     .tz("Asia/Dhaka")
     .subtract(1, "day")
     .format("YYYY-MM-DD");
-  console.log(yesterday);
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+      if (!storedUser) {
+        navigate("/login");
+      }
+    }, []);
 
   useEffect(() => {
     fetchHolidays();
