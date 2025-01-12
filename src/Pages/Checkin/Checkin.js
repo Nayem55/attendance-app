@@ -14,11 +14,9 @@ const CheckInPage = () => {
   const [note, setNote] = useState("");
   const [image, setImage] = useState(null);
   const [time, setTime] = useState("");
-  // const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [userLoading, setUserLoading] = useState(true);
   const [captured, setCaptured] = useState(false);
-  // const [user, setUser] = useState({});
+  const [locationError, setLocationError] = useState(""); // To store location error
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -28,6 +26,7 @@ const CheckInPage = () => {
     const currentTime = dayjs().tz("Asia/Dhaka").format("hh:mm A");
     setTime(currentTime);
   };
+
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -40,18 +39,18 @@ const CheckInPage = () => {
         reject("Geolocation is not supported by your browser.");
         return;
       }
-  
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           resolve({ latitude, longitude });
         },
         (error) => {
-          // Map error codes to meaningful messages
           let errorMessage = "An unknown error occurred.";
           switch (error.code) {
             case error.PERMISSION_DENIED:
-              errorMessage = "Location access denied. Please allow location permissions.";
+              errorMessage =
+                "Location access denied. Please allow location permissions.";
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = "Location information is unavailable.";
@@ -60,73 +59,21 @@ const CheckInPage = () => {
               errorMessage = "Request timed out. Please try again.";
               break;
           }
+          setLocationError(errorMessage); // Set the error message
           reject(errorMessage);
         },
         {
-          enableHighAccuracy: true, // Use GPS for better accuracy
-          timeout: 10000, // 10-second timeout
-          maximumAge: 0, // Do not use cached position
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     });
   };
-  
-
 
   useEffect(() => {
-    // if (storedUser) {
-    //   const fetchUser = async () => {
-    //     try {
-    //       const response = await axios.get(
-    //         `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?.id}`
-    //       );
-    //       const user = response.data;
-    //       setUser(user);
-    //     } catch (error) {
-    //       console.error("Error fetching user", error);
-    //     }
-    //     setUserLoading(false);
-    //   };
-
-    //   fetchUser();
-    //   fetchCurrentTime();
-    // }
     fetchCurrentTime();
   }, []);
-
-  // useEffect(() => {
-  //   const fetchLocation = async () => {
-  //     if (navigator.geolocation) {
-  //       navigator.geolocation.getCurrentPosition(
-  //         async (position) => {
-  //           const { latitude, longitude } = position.coords;
-  //           const response = await fetch(
-  //             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-  //           );
-  //           const data = await response.json();
-  //           const quarter = data.address.quarter || "";
-  //           const suburb =
-  //             data.address.suburb || data.address.neighborhood || "";
-  //           const city = data.address.city || "Dhaka";
-  //           setLocation(`${quarter}, ${suburb}, ${city}`);
-  //         },
-  //         (error) => {
-  //           console.error(error);
-  //           alert("Unable to fetch location: " + error.message);
-  //         },
-  //         {
-  //           enableHighAccuracy: true,
-  //           timeout: 10000,
-  //           maximumAge: 0,
-  //         }
-  //       );
-  //     } else {
-  //       alert("Geolocation is not supported by this browser.");
-  //     }
-  //   };
-
-  //   fetchLocation();
-  // }, []);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -149,40 +96,37 @@ const CheckInPage = () => {
     const context = canvas.getContext("2d");
     const video = videoRef.current;
 
-    // Draw the current frame of the video on the canvas
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convert the canvas content to a Blob
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("image", blob, "capture.png");
 
-      setLoading(true); // Set loading state to true while uploading
+      setLoading(true);
 
       try {
-        // Upload the image to ImgBB
         const response = await axios.post(
-          "https://api.imgbb.com/1/upload?expiration=2592000&key=293a0c42ccc6a11a4d90a9b7974dbb60", // ImgBB API
+          "https://api.imgbb.com/1/upload?expiration=2592000&key=293a0c42ccc6a11a4d90a9b7974dbb60",
           formData
         );
         const imageUrl = response.data.data.url;
-        setImage(imageUrl); // Set the uploaded image URL to the image state
-        setCaptured(true); // Set the captured state to true
+        setImage(imageUrl);
+        setCaptured(true);
         toast.success("Image uploaded successfully!");
       } catch (error) {
         toast.error("Failed to upload image.");
       } finally {
-        setLoading(false); // Set loading state back to false after uploading
+        setLoading(false);
       }
     }, "image/png");
   };
 
   const handleRetake = () => {
-    setImage(null); // Clear the captured image
-    setCaptured(false); // Set captured state to false
-    canvasRef.current.style.display = "none"; // Show the canvas again
+    setImage(null);
+    setCaptured(false);
+    canvasRef.current.style.display = "none";
   };
 
   const handleCheckIn = async () => {
@@ -192,10 +136,8 @@ const CheckInPage = () => {
     const checkInHour = dayjs(checkInTime).hour();
     const checkInMinute = dayjs(checkInTime).minute();
 
-    // Get user's location (lat, lng)
     const location = await fetchUserLocation();
 
-    // Determine the status based on check-in time
     const status =
       checkInHour > 10 || (checkInHour === 10 && checkInMinute > 15)
         ? "Late"
@@ -209,13 +151,12 @@ const CheckInPage = () => {
           note,
           image,
           time: checkInTime,
-          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"), // Add today's date
-          status, // Include the status
-          location, // Include location (lat and lng)
+          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"),
+          status,
+          location,
         }
       );
 
-      // Update the user’s check-in status
       user.checkIn = true;
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -226,18 +167,17 @@ const CheckInPage = () => {
         error.response ? error.response.data.message : "Error during check-in"
       );
     } finally {
-      setLoading(false); // Set loading state back to false after submission
+      setLoading(false);
     }
   };
 
   const handleCheckOut = async () => {
+    setLoading(true);
+
     const user = JSON.parse(localStorage.getItem("user"));
     const checkOutTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
 
-    // Get user's location (lat, lng) at the time of checkout
     const location = await fetchUserLocation();
-
-    setLoading(true); // Set loading state to true while submitting check-out
 
     try {
       const response = await axios.post(
@@ -247,13 +187,12 @@ const CheckInPage = () => {
           note,
           image,
           time: checkOutTime,
-          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"), // Add today's date
-          location, // Include location (lat and lng)
+          date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"),
+          location,
         }
       );
 
       user.checkIn = false;
-      // user.checkOutTime = checkOutTime; // Uncomment if you want to store checkout time
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success(response.data.message);
@@ -263,7 +202,7 @@ const CheckInPage = () => {
         error.response ? error.response.data.message : "Error during check-out"
       );
     } finally {
-      setLoading(false); // Set loading state back to false after submission
+      setLoading(false);
     }
   };
 
@@ -325,19 +264,21 @@ const CheckInPage = () => {
               <td className="p-2">Current Time</td>
               <td className="p-2">{time}</td>
             </tr>
-            {/* <tr>
-              <td className="p-2">Location</td>
-              <td className="p-2">{location || "Fetching location..."}</td>
-            </tr> */}
           </tbody>
         </table>
       </div>
+      {locationError && (
+        <div className="text-red-500 text-center mb-4">
+          <p>{locationError}</p>
+          <p>Please enable location access to proceed with check-in.</p>
+        </div>
+      )}
       <div className="text-center">
         {user && user?.checkIn ? (
           <button
             className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
             onClick={handleCheckOut}
-            disabled={loading} // Disable button while loading
+            disabled={loading || locationError} // Disable button if loading or location error
           >
             {loading ? "Please wait..." : "Check Out"}
           </button>
@@ -345,7 +286,7 @@ const CheckInPage = () => {
           <button
             className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
             onClick={handleCheckIn}
-            disabled={loading} // Disable button while loading
+            disabled={loading || locationError} // Disable button if loading or location error
           >
             {loading ? "Please wait..." : "Check In"}
           </button>
