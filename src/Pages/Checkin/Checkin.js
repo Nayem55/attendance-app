@@ -17,6 +17,7 @@ const CheckInPage = () => {
   const [loading, setLoading] = useState(false);
   const [captured, setCaptured] = useState(false);
   const [locationError, setLocationError] = useState(""); // To store location error
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false); // Track if location is enabled
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const CheckInPage = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           resolve({ latitude, longitude });
+          setIsLocationEnabled(true); // Set location enabled if successful
         },
         (error) => {
           let errorMessage = "An unknown error occurred.";
@@ -51,15 +53,20 @@ const CheckInPage = () => {
             case error.PERMISSION_DENIED:
               errorMessage =
                 "Location access denied. Please allow location permissions.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = "Location information is unavailable.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
               break;
             case error.TIMEOUT:
               errorMessage = "Request timed out. Please try again.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
               break;
           }
-          setLocationError(errorMessage); // Set the error message
           reject(errorMessage);
         },
         {
@@ -73,6 +80,7 @@ const CheckInPage = () => {
 
   useEffect(() => {
     fetchCurrentTime();
+    fetchUserLocation(); 
   }, []);
 
   useEffect(() => {
@@ -130,6 +138,11 @@ const CheckInPage = () => {
   };
 
   const handleCheckIn = async () => {
+    if (!isLocationEnabled) {
+      toast.error("Location is required. Please enable location to check-in.");
+      return;
+    }
+
     setLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
     const checkInTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
@@ -267,28 +280,22 @@ const CheckInPage = () => {
           </tbody>
         </table>
       </div>
-      {locationError && (
-        <div className="text-red-500 text-center mb-4">
-          <p>{locationError}</p>
-          <p>Please enable location access to proceed with check-in.</p>
-        </div>
-      )}
       <div className="text-center">
         {user && user?.checkIn ? (
           <button
-            className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
+            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${ !isLocationEnabled ?"bg-[#cccccc]":"bg-[#e57e38]"}`}
             onClick={handleCheckOut}
-            disabled={loading || locationError} // Disable button if loading or location error
+            disabled={loading || !isLocationEnabled} 
           >
-            {loading ? "Please wait..." : "Check Out"}
+            {loading ? "Please wait..." : !isLocationEnabled ? "Please turn on your location" : "Check In"}
           </button>
         ) : (
           <button
-            className="w-full bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2"
+            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${ !isLocationEnabled ?"bg-[#cccccc]":"bg-[#e57e38]"}`}
             onClick={handleCheckIn}
-            disabled={loading || locationError} // Disable button if loading or location error
+            disabled={loading || !isLocationEnabled} 
           >
-            {loading ? "Please wait..." : "Check In"}
+            {loading ? "Please wait..." : !isLocationEnabled ? "Please turn on your location" : "Check In"}
           </button>
         )}
       </div>
