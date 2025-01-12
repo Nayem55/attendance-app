@@ -80,7 +80,7 @@ const CheckInPage = () => {
 
   useEffect(() => {
     fetchCurrentTime();
-    fetchUserLocation(); 
+    fetchUserLocation();
   }, []);
 
   useEffect(() => {
@@ -283,19 +283,41 @@ const CheckInPage = () => {
       <div className="text-center">
         {user && user?.checkIn ? (
           <button
-            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${ !isLocationEnabled ?"bg-[#cccccc]":"bg-[#e57e38]"}`}
+            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${
+              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#e57e38]"
+            }`}
             onClick={handleCheckOut}
-            disabled={loading || !isLocationEnabled} 
+            disabled={loading || !isLocationEnabled}
           >
-            {loading ? "Please wait..." : !isLocationEnabled ? "Please turn on your location" : "Check In"}
+            {loading
+              ? "Please wait..."
+              : !isLocationEnabled
+              ? "Please turn on your location"
+              : "Check Out"}
           </button>
         ) : (
           <button
-            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${ !isLocationEnabled ?"bg-[#cccccc]":"bg-[#e57e38]"}`}
+            className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${
+              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#e57e38]"
+            }`}
             onClick={handleCheckIn}
-            disabled={loading || !isLocationEnabled} 
+            disabled={loading || !isLocationEnabled}
           >
-            {loading ? "Please wait..." : !isLocationEnabled ? "Please turn on your location" : "Check In"}
+            {loading
+              ? "Please wait..."
+              : !isLocationEnabled
+              ? "Please turn on your location"
+              : "Check In"}
+          </button>
+        )}
+        {!isLocationEnabled && (
+          <button
+            onClick={() => {
+              fetchUserLocation(); // Re-fetch user location
+            }}
+            className="mt-2 font-bold py-1 px-2 text-black rounded"
+          >
+            I have turned on location
           </button>
         )}
       </div>
