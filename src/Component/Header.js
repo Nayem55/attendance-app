@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../Images/Gvi-logo.png";
+import application from "../Images/Application2.png";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -84,6 +85,23 @@ const Header = () => {
             <p className="font-bold">Home</p>
           </Link>
           <Link
+            to="/check-in"
+            className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
+            onClick={toggleSidebar}
+          >
+            <svg
+              className="w-[32px] p-1"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 384 512"
+            >
+              <path
+                fill="#000"
+                d="M192 0c-41.8 0-77.4 26.7-90.5 64L64 64C28.7 64 0 92.7 0 128L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64l-37.5 0C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM128 256a64 64 0 1 1 128 0 64 64 0 1 1 -128 0zM80 432c0-44.2 35.8-80 80-80l64 0c44.2 0 80 35.8 80 80c0 8.8-7.2 16-16 16L96 448c-8.8 0-16-7.2-16-16z"
+              />
+            </svg>
+            <p className="font-bold">Attendance</p>
+          </Link>
+          <Link
             to="/profile"
             className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
             onClick={toggleSidebar}
@@ -96,6 +114,14 @@ const Header = () => {
               <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
             </svg>
             <p className="font-bold">Profile</p>
+          </Link>
+          <Link
+            to={user?.role === "super admin" ? "/admin" : "/user-dashboard"}
+            className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
+            onClick={toggleSidebar}
+          >
+            <img className="w-[32px]" alt="" src={application} />
+            <p className="font-bold">Application</p>
           </Link>
           <Link
             to={user?.role === "super admin" ? "/admin" : "/user-dashboard"}
