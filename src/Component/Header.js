@@ -48,7 +48,7 @@ const Header = () => {
         } transition-transform duration-300 ease-in-out z-50`}
       >
         <div className="flex justify-between items-center p-4 bg-[#e57e38] text-white">
-          <h2 className="text-lg font-bold">Menu</h2>
+          <h2 className="text-lg font-bold">{user ? user?.name : "Menu"}</h2>
           <button
             className="text-white text-xl focus:outline-none"
             onClick={toggleSidebar}
