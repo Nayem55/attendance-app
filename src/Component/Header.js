@@ -98,7 +98,7 @@ const Header = () => {
             <p className="font-bold">Profile</p>
           </Link>
           <Link
-            to={user?.role === "super admin" ? "/admin" : "/user/dashboard"}
+            to={user?.role === "super admin" ? "/admin" : "/user-dashboard"}
             className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
             onClick={toggleSidebar}
           >

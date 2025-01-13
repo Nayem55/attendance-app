@@ -12,6 +12,7 @@ import HolidayManagement from "../Pages/AdminDashboard/HolidayManagement";
 import LeaveRequestPage from "../Pages/LeaveRequestPage";
 import HistoryPage from "../Pages/HistoryPage";
 import ApplicationsPage from "../Pages/AdminDashboard/ApplicationsPage";
+import UserDashboard from "../Pages/UserDashboard";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "/leave-history",
         element: <HistoryPage/>,
+      },
+      {
+        path: "/user-dashboard",
+        element: <UserDashboard/>,
       },
       {
         path: "/admin",
