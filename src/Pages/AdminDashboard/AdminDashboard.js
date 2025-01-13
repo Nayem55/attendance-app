@@ -7,6 +7,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
+  const [selectedRole, setSelectedRole] = useState("office"); // Default to 'office'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
   const [totalWorkingDays, setTotalWorkingDays] = useState(null);
@@ -14,17 +15,17 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    useEffect(() => {
-      if (!storedUser) {
-        navigate("/login");
-      }
-    }, []);
+  useEffect(() => {
+    if (!storedUser) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     fetchWorkingDays(selectedMonth);
-    fetchUserReports(selectedMonth);
+    fetchUserReports(selectedMonth, selectedRole); // Add role to the dependency
     fetchPendingRequest();
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedRole]);
 
   const fetchPendingRequest = async () => {
     try {
@@ -73,16 +74,20 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchUserReports = async (month) => {
+  const fetchUserReports = async (month, role) => {
     setLoading(true);
     setError(null);
     try {
       const [year, monthNumber] = month.split("-");
+      // Fetch users filtered by role from the backend
       const usersResponse = await axios.get(
-        "https://attendance-app-server-blue.vercel.app/getAllUser"
+        `https://attendance-app-server-blue.vercel.app/getAllUser`,
+        {
+          params: { role } // Send role as a query parameter
+        }
       );
       const users = usersResponse.data;
-
+  
       const reportsData = await Promise.all(
         users.map(async (user) => {
           const checkInsResponse = await axios.get(
@@ -91,22 +96,22 @@ const AdminDashboard = () => {
               params: { month: monthNumber, year: year },
             }
           );
-
+  
           const checkIns = checkInsResponse.data;
           const totalCheckIns = checkIns.length;
-
+  
           // Late check-ins calculation (after 10:15 AM)
           const lateCheckInsCount = checkIns.filter(
             (checkin) => checkin.status === "Late"
           ).length;
-
+  
           // Fetch approved leave days for the user in the selected month
           const approvedLeaveDays = await fetchApprovedLeaves(
             user._id,
             monthNumber,
             year
           );
-
+  
           return {
             username: user.name,
             number: user.number,
@@ -128,9 +133,13 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
-
+  
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
+  };
+
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
   };
 
   return (
@@ -191,14 +200,27 @@ const AdminDashboard = () => {
         </button>
 
         <h1 className="text-xl font-bold mb-4">Monthly Report</h1>
-        <div className="mb-4">
-          <label className="mr-2 font-semibold">Select Month:</label>
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={handleMonthChange}
-            className="border rounded px-2 py-1"
-          />
+        <div className="mb-4 flex items-center space-x-4">
+          <div>
+            <label className="mr-2 font-semibold">Select Month:</label>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="border rounded px-2 py-1"
+            />
+          </div>
+          <div>
+            <label className="mr-2 font-semibold">Filter by User Role:</label>
+            <select
+              value={selectedRole}
+              onChange={handleRoleChange}
+              className="border rounded px-2 py-1"
+            >
+              <option value="office">Office</option>
+              <option value="super admin">Super Admin</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -219,14 +241,14 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">
                     Total Check-Ins
                   </th>
-                  <th className="border border-gray-300 px-4 py-2">
+                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">
                     Late Check-Ins
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
                     Approved Leave
                   </th>
 
-                  <th className="border border-gray-300 px-4 py-2">Absent</th>
+                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">Absent</th>
                   <th className="border border-gray-300 px-4 py-2">Month</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Daily Report
@@ -251,13 +273,13 @@ const AdminDashboard = () => {
                     <td className="border border-gray-300 px-4 py-2">
                       {report.totalCheckIns}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="border border-gray-300 bg-red-300 px-4 py-2">
                       {report.lateCheckIns}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.approvedLeaves}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="border border-gray-300  bg-red-300 px-4 py-2">
                       {totalWorkingDays
                         ? totalWorkingDays -
                           report.totalCheckIns -

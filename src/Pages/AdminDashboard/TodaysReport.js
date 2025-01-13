@@ -14,25 +14,29 @@ const TodaysReport = () => {
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("YYYY-MM-DD")
   ); // State for selected date
+  const [selectedRole, setSelectedRole] = useState("office"); // State for selected role
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    useEffect(() => {
-      if (!storedUser) {
-        navigate("/login");
-      }
-    }, []);
+  useEffect(() => {
+    if (!storedUser) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
-    fetchReports(selectedDate);
-  }, [selectedDate]);
+    fetchReports(selectedDate, selectedRole);
+  }, [selectedDate, selectedRole]);
 
-  const fetchReports = async (date) => {
+  const fetchReports = async (date, role) => {
     setLoading(true);
     setError(null);
     try {
       const usersResponse = await axios.get(
-        "https://attendance-app-server-blue.vercel.app/getAllUser"
+        "https://attendance-app-server-blue.vercel.app/getAllUser",
+        {
+          params: { role }, // Pass the selected role
+        }
       );
       const users = usersResponse.data;
 
@@ -106,7 +110,7 @@ const TodaysReport = () => {
       setLoading(false);
     }
   };
-  console.log(todaysReports);
+
   const handleStatusChange = (reportId, newStatus) => {
     setUpdatedStatuses((prev) => ({
       ...prev,
@@ -202,17 +206,36 @@ const TodaysReport = () => {
 
         <h1 className="text-xl font-bold mb-4">Today's Report</h1>
 
-        {/* Date Filter */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
-            Select Date:
-          </label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/3"
-          />
+        <div className="flex gap-10 w-[80%]">
+          {/* Date Filter */}
+          <div className="mb-4 w-[100%]">
+            <label className="block text-gray-700 font-bold mb-2">
+              Select Date:
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+          </div>
+
+          {/* Role Filter */}
+          <div className="mb-4 w-[100%]">
+            <label className="block text-gray-700 font-bold mb-2">
+              Select Role:
+            </label>
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            >
+              <option value="office">Office</option>
+              <option value="super admin">Super admin</option>
+
+              {/* Add more roles as needed */}
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -272,45 +295,41 @@ const TodaysReport = () => {
                       {report?.status !== "Absent" && report.checkInTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkOutTime}
+                      {report?.status !== "Absent" && report.checkOutTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.totalWorkTime}
+                      {report?.status !== "Absent" && report.totalWorkTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkInNote}
+                      {report?.status !== "Absent" && report.checkInNote}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkInLocation}
+                      {report?.status !== "Absent" && report.checkInLocation}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkInImage ? (
+                      {report?.status !== "Absent" && (
                         <img
                           src={report.checkInImage}
                           alt="Check-in"
-                          className="cursor-pointer w-12 h-12 object-cover"
+                          className="w-16 h-16 object-cover"
                           onClick={() => handleImageClick(report.checkInImage)}
                         />
-                      ) : (
-                        "N/A"
                       )}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkOutNote}
+                      {report?.status !== "Absent" && report.checkOutNote}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkOutLocation}
+                      {report?.status !== "Absent" && report.checkOutLocation}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report.checkOutImage ? (
+                      {report?.status !== "Absent" && (
                         <img
                           src={report.checkOutImage}
                           alt="Check-out"
-                          className="cursor-pointer w-12 h-12 object-cover"
+                          className="w-16 h-16 object-cover"
                           onClick={() => handleImageClick(report.checkOutImage)}
                         />
-                      ) : (
-                        "N/A"
                       )}
                     </td>
                     <td
@@ -355,25 +374,9 @@ const TodaysReport = () => {
             </table>
           </div>
         ) : (
-          <p className="text-gray-500">
-            No check-ins or check-outs for the selected date.
-          </p>
+          <p>No reports available for the selected date and role.</p>
         )}
       </div>
-
-      {/* Modal for Image */}
-      {selectedImage && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          onClick={closeImageModal}
-        >
-          <img
-            src={selectedImage}
-            alt="Selected"
-            className="max-w-full max-h-full object-contain"
-          />
-        </div>
-      )}
     </div>
   );
 };
