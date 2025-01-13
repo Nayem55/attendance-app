@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [pendingReq, setPendingReq] = useState(0);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
+  const dayCount = dayjs(selectedMonth).daysInMonth();
 
   useEffect(() => {
     if (!storedUser) {
@@ -83,11 +84,11 @@ const AdminDashboard = () => {
       const usersResponse = await axios.get(
         `https://attendance-app-server-blue.vercel.app/getAllUser`,
         {
-          params: { role } // Send role as a query parameter
+          params: { role }, // Send role as a query parameter
         }
       );
       const users = usersResponse.data;
-  
+
       const reportsData = await Promise.all(
         users.map(async (user) => {
           const checkInsResponse = await axios.get(
@@ -96,22 +97,22 @@ const AdminDashboard = () => {
               params: { month: monthNumber, year: year },
             }
           );
-  
+
           const checkIns = checkInsResponse.data;
           const totalCheckIns = checkIns.length;
-  
+
           // Late check-ins calculation (after 10:15 AM)
           const lateCheckInsCount = checkIns.filter(
             (checkin) => checkin.status === "Late"
           ).length;
-  
+
           // Fetch approved leave days for the user in the selected month
           const approvedLeaveDays = await fetchApprovedLeaves(
             user._id,
             monthNumber,
             year
           );
-  
+
           return {
             username: user.name,
             number: user.number,
@@ -133,7 +134,7 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
-  
+
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
   };
@@ -238,6 +239,8 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">
                     Total Working Days
                   </th>
+                  <th className="border border-gray-300 px-4 py-2">Holidays</th>
+                  <th className="border border-gray-300 px-4 py-2">Extra</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Total Check-Ins
                   </th>
@@ -248,7 +251,9 @@ const AdminDashboard = () => {
                     Approved Leave
                   </th>
 
-                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">Absent</th>
+                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">
+                    Absent
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Month</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Daily Report
@@ -271,6 +276,16 @@ const AdminDashboard = () => {
                       {totalWorkingDays}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
+                      {dayCount - totalWorkingDays-(report.totalCheckIns - totalWorkingDays > 0
+                        ? report.totalCheckIns - totalWorkingDays
+                        : 0)}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.totalCheckIns - totalWorkingDays > 0
+                        ? report.totalCheckIns - totalWorkingDays
+                        : 0}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
                       {report.totalCheckIns}
                     </td>
                     <td className="border border-gray-300 bg-red-300 px-4 py-2">
@@ -280,11 +295,13 @@ const AdminDashboard = () => {
                       {report.approvedLeaves}
                     </td>
                     <td className="border border-gray-300  bg-red-300 px-4 py-2">
-                      {totalWorkingDays
+                      {(totalWorkingDays -
+                          report.totalCheckIns -
+                          report.approvedLeaves)>0
                         ? totalWorkingDays -
                           report.totalCheckIns -
                           report.approvedLeaves
-                        : "N/A"}
+                        : 0}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {dayjs(report.month).format("MMMM")},{" "}
