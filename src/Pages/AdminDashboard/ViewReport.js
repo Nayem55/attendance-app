@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ViewReport = () => {
   const { userId } = useParams(); // Fetch userId from route params
   const [userName, setUserName] = useState("");
   const [records, setRecords] = useState([]);
+  const [updatedStatuses, setUpdatedStatuses] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -14,11 +16,11 @@ const ViewReport = () => {
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    useEffect(() => {
-      if (!storedUser) {
-        navigate("/login");
-      }
-    }, []);
+  useEffect(() => {
+    if (!storedUser) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     fetchUserReport(selectedMonth);
@@ -58,9 +60,12 @@ const ViewReport = () => {
           dayjs(co.time).isSame(checkIn.time, "day")
         );
         return {
+          checkInId: checkIn._id,
           date: dayjs(checkIn?.time).format("DD MMMM YYYY"),
           checkInTime: dayjs(checkIn?.time).format("hh:mm A") || "N/A",
+          checkInNote: (checkIn?.note) || "N/A",
           checkOutTime: dayjs(checkOut?.time).format("hh:mm A") || "N/A",
+          checkOutNote: (checkOut?.note) || "N/A",
           status: checkIn.status,
         };
       });
@@ -76,6 +81,42 @@ const ViewReport = () => {
 
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
+  };
+
+  const handleStatusChange = (checkInId, newStatus) => {
+    setUpdatedStatuses((prev) => ({
+      ...prev,
+      [checkInId]: newStatus,
+    }));
+  };
+
+  const saveStatus = async (checkInId) => {
+    const newStatus = updatedStatuses[checkInId];
+
+    if (!newStatus) {
+      toast.error("Please select a status to update.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `https://attendance-app-server-blue.vercel.app/api/update-status/${checkInId}`,
+        { status: newStatus }
+      );
+
+      toast.success(response.data.message);
+      setRecords((prevReports) =>
+        prevReports.map((report) =>
+          report.checkInId === checkInId
+            ? { ...report, status: newStatus }
+            : report
+        )
+      );
+      // fetchUserReport(selectedMonth);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status. Please try again.");
+    }
   };
 
   return (
@@ -160,9 +201,18 @@ const ViewReport = () => {
                     Check-In Time
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
+                    Check-In Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
                     Check-Out Time
                   </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-Out Note
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Update Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -178,10 +228,49 @@ const ViewReport = () => {
                       {record.checkInTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
+                      {record.checkInNote}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
                       {record.checkOutTime || "N/A"}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
+                      {record.checkOutNote || "N/A"}
+                    </td>
+                    <td
+                      className={`border border-gray-300 font-bold px-4 py-2 ${
+                        record.status === "Pending"
+                          ? "text-[#F16F24]"
+                          : record.status === "Rejected" ||
+                            record.status === "Late" ||
+                            record.status === "Absent"
+                          ? "text-[#B7050E]"
+                          : "text-[#0DC143]"
+                      }`}
+                    >
                       {record.status}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
+                      <select
+                        className="px-2 py-1"
+                        value={updatedStatuses[record.checkInId] || ""}
+                        onChange={(e) =>
+                          handleStatusChange(record.checkInId, e.target.value)
+                        }
+                      >
+                        <option value="">Update Status</option>
+                        <option value="Approved Late">Approved Late</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved Leave">Approved Leave</option>
+                        <option value="Success">Success</option>
+                        <option value="Late">Late</option>
+                      </select>
+                      <button
+                        onClick={() => saveStatus(record.checkInId)}
+                        className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
+                      >
+                        Save
+                      </button>
                     </td>
                   </tr>
                 ))}

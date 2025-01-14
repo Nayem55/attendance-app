@@ -310,7 +310,7 @@ const TodaysReport = () => {
                       {report?.status !== "Absent" && (
                         <img
                           src={report.checkInImage}
-                          alt="Check-in"
+                          alt=""
                           className="w-16 h-16 object-cover"
                           onClick={() => handleImageClick(report.checkInImage)}
                         />
@@ -326,7 +326,7 @@ const TodaysReport = () => {
                       {report?.status !== "Absent" && (
                         <img
                           src={report.checkOutImage}
-                          alt="Check-out"
+                          alt=""
                           className="w-16 h-16 object-cover"
                           onClick={() => handleImageClick(report.checkOutImage)}
                         />

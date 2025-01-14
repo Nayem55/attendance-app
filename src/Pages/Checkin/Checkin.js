@@ -189,8 +189,16 @@ const CheckInPage = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
     const checkOutTime = dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD HH:mm:ss");
+    const checkOutHour = dayjs(checkOutTime).hour();
+    const checkOutMinute = dayjs(checkOutTime).minute();
 
     const location = await fetchUserLocation();
+
+    const status =
+    checkOutHour > 20 || (checkOutHour === 20 && checkOutMinute >= 0)
+        ? "Overtime"
+        : "Success";
+
 
     try {
       const response = await axios.post(
@@ -201,6 +209,7 @@ const CheckInPage = () => {
           image,
           time: checkOutTime,
           date: dayjs().tz("Asia/Dhaka").format("YYYY-MM-DD"),
+          status,
           location,
         }
       );
