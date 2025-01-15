@@ -11,10 +11,8 @@ const TodaysReport = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [updatedStatuses, setUpdatedStatuses] = useState({});
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("YYYY-MM-DD")
-  ); // State for selected date
-  const [selectedRole, setSelectedRole] = useState("office"); // State for selected role
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD")); 
+  const [selectedRole, setSelectedRole] = useState("office");
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -34,9 +32,7 @@ const TodaysReport = () => {
     try {
       const usersResponse = await axios.get(
         "https://attendance-app-server-blue.vercel.app/getAllUser",
-        {
-          params: { role }, // Pass the selected role
-        }
+        { params: { role } }
       );
       const users = usersResponse.data;
 
@@ -44,16 +40,12 @@ const TodaysReport = () => {
         users.map(async (user) => {
           const checkInsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkins/${user._id}`,
-            {
-              params: { date },
-            }
+            { params: { date } }
           );
 
           const checkOutsResponse = await axios.get(
             `https://attendance-app-server-blue.vercel.app/api/checkouts/${user._id}`,
-            {
-              params: { date },
-            }
+            { params: { date } }
           );
 
           const checkIns = checkInsResponse.data;
@@ -207,7 +199,6 @@ const TodaysReport = () => {
         <h1 className="text-xl font-bold mb-4">Today's Report</h1>
 
         <div className="flex gap-10 w-[80%]">
-          {/* Date Filter */}
           <div className="mb-4 w-[100%]">
             <label className="block text-gray-700 font-bold mb-2">
               Select Date:
@@ -220,7 +211,6 @@ const TodaysReport = () => {
             />
           </div>
 
-          {/* Role Filter */}
           <div className="mb-4 w-[100%]">
             <label className="block text-gray-700 font-bold mb-2">
               Select Role:
@@ -232,8 +222,6 @@ const TodaysReport = () => {
             >
               <option value="office">Office</option>
               <option value="super admin">Super admin</option>
-
-              {/* Add more roles as needed */}
             </select>
           </div>
         </div>
@@ -249,36 +237,16 @@ const TodaysReport = () => {
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Phone</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-in Time
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-out Time
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Total Work Time
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-in Note
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-in Location
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-in Image
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-out Note
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-out Location
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Check-out Image
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Attendance Status
-                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Check-in Time</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-out Time</th>
+                  <th className="border border-gray-300 px-4 py-2">Total Work Time</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-in Note</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-in Location</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-in Image</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-out Note</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-out Location</th>
+                  <th className="border border-gray-300 px-4 py-2">Check-out Image</th>
+                  <th className="border border-gray-300 px-4 py-2">Attendance Status</th>
                   <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
               </thead>
@@ -311,7 +279,7 @@ const TodaysReport = () => {
                         <img
                           src={report.checkInImage}
                           alt=""
-                          className="w-16 h-16 object-cover"
+                          className="w-16 h-16 object-cover cursor-pointer"
                           onClick={() => handleImageClick(report.checkInImage)}
                         />
                       )}
@@ -327,7 +295,7 @@ const TodaysReport = () => {
                         <img
                           src={report.checkOutImage}
                           alt=""
-                          className="w-16 h-16 object-cover"
+                          className="w-16 h-16 object-cover cursor-pointer"
                           onClick={() => handleImageClick(report.checkOutImage)}
                         />
                       )}
@@ -375,6 +343,25 @@ const TodaysReport = () => {
           </div>
         ) : (
           <p>No reports available for the selected date and role.</p>
+        )}
+
+        {/* Modal */}
+        {selectedImage && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+            <div className="relative rounded shadow-md">
+              <button
+                className="absolute top-4 right-4 text-4xl text-black hover:text-gray-800"
+                onClick={closeImageModal}
+              >
+                ✕
+              </button>
+              <img
+                src={selectedImage}
+                alt="Enlarged"
+                className="max-w-[90vw] max-h-[90vh] object-cover"
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
