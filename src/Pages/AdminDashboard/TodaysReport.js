@@ -11,8 +11,10 @@ const TodaysReport = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [updatedStatuses, setUpdatedStatuses] = useState({});
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD")); 
-  const [selectedRole, setSelectedRole] = useState("office");
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  );
+  const [selectedRole, setSelectedRole] = useState("MR");
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -23,16 +25,18 @@ const TodaysReport = () => {
   }, []);
 
   useEffect(() => {
-    fetchReports(selectedDate, selectedRole);
+    fetchReports(selectedDate, selectedRole, storedUser.group, storedUser.zone);
   }, [selectedDate, selectedRole]);
 
-  const fetchReports = async (date, role) => {
+  const fetchReports = async (date, role, group, zone) => {
     setLoading(true);
     setError(null);
     try {
       const usersResponse = await axios.get(
-        "https://attendance-app-server-blue.vercel.app/getAllUser",
-        { params: { role } }
+        `https://attendance-app-server-blue.vercel.app/getAllUser`,
+        {
+          params: { role, group, zone }, // Include group and zone as query parameters
+        }
       );
       const users = usersResponse.data;
 
@@ -184,6 +188,12 @@ const TodaysReport = () => {
           >
             Leave Requests
           </Link>
+          <Link
+            to="/admin/user"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+          >
+            Users
+          </Link>
         </nav>
       </div>
 
@@ -220,8 +230,17 @@ const TodaysReport = () => {
               onChange={(e) => setSelectedRole(e.target.value)}
               className="border border-gray-300 rounded px-3 py-2 w-full"
             >
-              <option value="office">Office</option>
-              <option value="super admin">Super admin</option>
+              {storedUser.role === "super admin" && (
+                <option value="office">Office</option>
+              )}
+              {storedUser.role === "super admin" && (
+                <option value="super admin">Super Admin</option>
+              )}
+              {(storedUser.role === "super admin" ||
+                storedUser.role === "RSM") && <option value="RSM">RSM</option>}
+
+              <option value="ASM">ASM</option>
+              <option value="MR">MR</option>
             </select>
           </div>
         </div>
@@ -237,16 +256,36 @@ const TodaysReport = () => {
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Phone</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Total Work Time</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Note</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Location</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-in Image</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Note</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Location</th>
-                  <th className="border border-gray-300 px-4 py-2">Check-out Image</th>
-                  <th className="border border-gray-300 px-4 py-2">Attendance Status</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Total Work Time
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-in Image
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-out Image
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Attendance Status
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
               </thead>

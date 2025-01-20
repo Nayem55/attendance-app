@@ -7,7 +7,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
-  const [selectedRole, setSelectedRole] = useState("office"); // Default to 'office'
+  const [selectedRole, setSelectedRole] = useState("MR"); // Default to 'office'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
   const [totalWorkingDays, setTotalWorkingDays] = useState(null);
@@ -24,7 +24,12 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchWorkingDays(selectedMonth);
-    fetchUserReports(selectedMonth, selectedRole); // Add role to the dependency
+    fetchUserReports(
+      selectedMonth,
+      selectedRole,
+      storedUser.group,
+      storedUser.zone
+    ); // Add role to the dependency
     fetchPendingRequest();
   }, [selectedMonth, selectedRole]);
 
@@ -75,7 +80,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchUserReports = async (month, role) => {
+  const fetchUserReports = async (month, role, group, zone) => {
     setLoading(true);
     setError(null);
     try {
@@ -84,7 +89,7 @@ const AdminDashboard = () => {
       const usersResponse = await axios.get(
         `https://attendance-app-server-blue.vercel.app/getAllUser`,
         {
-          params: { role }, // Send role as a query parameter
+          params: { role, group, zone }, // Include group and zone as query parameters
         }
       );
       const users = usersResponse.data;
@@ -134,6 +139,7 @@ const AdminDashboard = () => {
             approvedLeaves: approvedLeaveDays,
             month: monthNumber,
             year: year,
+            zone: user.zone,
           };
         })
       );
@@ -199,6 +205,12 @@ const AdminDashboard = () => {
               {pendingReq > 0 && pendingReq}
             </span>
           </Link>
+          <Link
+            to="/admin/user"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+          >
+            Users
+          </Link>
         </nav>
       </div>
 
@@ -229,8 +241,17 @@ const AdminDashboard = () => {
               onChange={handleRoleChange}
               className="border rounded px-2 py-1"
             >
-              <option value="office">Office</option>
-              <option value="super admin">Super Admin</option>
+              {storedUser.role === "super admin" && (
+                <option value="office">Office</option>
+              )}
+              {storedUser.role === "super admin" && (
+                <option value="super admin">Super Admin</option>
+              )}
+              {(storedUser.role === "super admin" ||
+                storedUser.role === "RSM") && <option value="RSM">RSM</option>}
+
+              <option value="ASM">ASM</option>
+              <option value="MR">MR</option>
             </select>
           </div>
         </div>
@@ -247,6 +268,7 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   {/* <th className="border border-gray-300 px-4 py-2">Phone</th> */}
                   <th className="border border-gray-300 px-4 py-2">Role</th>
+                  <th className="border border-gray-300 px-4 py-2">Zone</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Total Working Days
                   </th>
@@ -257,7 +279,9 @@ const AdminDashboard = () => {
                   <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">
                     Absent
                   </th>
-                  <th className="border border-gray-300 px-4 py-2 bg-[#0B6222] text-white">Extra Day</th>
+                  <th className="border border-gray-300 px-4 py-2 bg-[#0B6222] text-white">
+                    Extra Day
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">
                     Total Check-Ins
                   </th>
@@ -288,6 +312,9 @@ const AdminDashboard = () => {
                     </td> */}
                     <td className="border border-gray-300 px-4 py-2">
                       {report?.role}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report?.zone}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {totalWorkingDays}

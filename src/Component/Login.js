@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    number: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -63,12 +63,12 @@ const LoginForm = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="number"
+              name="number"
+              value={formData.number}
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
-              placeholder="Enter your email"
+              placeholder="Enter your number"
               required
             />
           </div>
@@ -95,7 +95,7 @@ const LoginForm = () => {
             </button>
           </div>
         </form>
-
+{/* 
         <div className="mt-6 text-center">
           <span className="text-sm text-gray-500">Don't have an account? </span>
           <a
@@ -104,7 +104,7 @@ const LoginForm = () => {
           >
             Sign up
           </a>
-        </div>
+        </div> */}
       </div>
     </div>
   );

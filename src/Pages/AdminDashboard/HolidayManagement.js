@@ -17,11 +17,11 @@ const HolidayPage = () => {
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    useEffect(() => {
-      if (!storedUser) {
-        navigate("/login");
-      }
-    }, []);
+  useEffect(() => {
+    if (!storedUser) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     fetchHolidays();
@@ -129,6 +129,12 @@ const HolidayPage = () => {
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Leave Requests
+          </Link>
+          <Link
+            to="/admin/user"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+          >
+            Users
           </Link>
         </nav>
       </div>

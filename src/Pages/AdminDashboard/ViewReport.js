@@ -63,9 +63,9 @@ const ViewReport = () => {
           checkInId: checkIn._id,
           date: dayjs(checkIn?.time).format("DD MMMM YYYY"),
           checkInTime: dayjs(checkIn?.time).format("hh:mm A") || "N/A",
-          checkInNote: (checkIn?.note) || "N/A",
+          checkInNote: checkIn?.note || "N/A",
           checkOutTime: dayjs(checkOut?.time).format("hh:mm A") || "N/A",
-          checkOutNote: (checkOut?.note) || "N/A",
+          checkOutNote: checkOut?.note || "N/A",
           status: checkIn.status,
         };
       });
@@ -160,6 +160,12 @@ const ViewReport = () => {
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Leave Requests
+          </Link>
+          <Link
+            to="/admin/user"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+          >
+            Users
           </Link>
         </nav>
       </div>

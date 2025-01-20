@@ -10,11 +10,11 @@ const ApplicationsPage = () => {
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    useEffect(() => {
-      if (!storedUser) {
-        navigate("/login");
-      }
-    }, []);
+  useEffect(() => {
+    if (!storedUser) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -25,7 +25,9 @@ const ApplicationsPage = () => {
         setApplications(response.data || []);
       } catch (error) {
         console.error("Error fetching leave applications:", error);
-        toast.error("Failed to load leave applications. Please try again later.");
+        toast.error(
+          "Failed to load leave applications. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -53,7 +55,8 @@ const ApplicationsPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this application?")) return;
+    if (!window.confirm("Are you sure you want to delete this application?"))
+      return;
 
     try {
       await axios.delete(
@@ -85,17 +88,35 @@ const ApplicationsPage = () => {
           </button>
         </div>
         <nav className="flex flex-col p-4 space-y-2">
-          <Link to="/admin" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Attendance Report
           </Link>
-          <Link to="/admin/today-report" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/today-report"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Today's Report
           </Link>
-          <Link to="/admin/holiday-management" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/holiday-management"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Holiday
           </Link>
-          <Link to="/admin/applications" className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700">
+          <Link
+            to="/admin/applications"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
             Leave Requests
+          </Link>
+          <Link
+            to="/admin/user"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+          >
+            Users
           </Link>
         </nav>
       </div>
@@ -136,11 +157,16 @@ const ApplicationsPage = () => {
               </thead>
               <tbody>
                 {applications.map((application) => (
-                  <tr key={application._id} className="border-t hover:bg-gray-50">
+                  <tr
+                    key={application._id}
+                    className="border-t hover:bg-gray-50"
+                  >
                     <td className="p-3">{application.userName}</td>
                     <td className="p-3">{application.phoneNumber}</td>
                     <td className="p-3">
-                      {new Date(application.leaveStartDate).toLocaleDateString()}
+                      {new Date(
+                        application.leaveStartDate
+                      ).toLocaleDateString()}
                     </td>
                     <td className="p-3">
                       {new Date(application.leaveEndDate).toLocaleDateString()}

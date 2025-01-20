@@ -48,7 +48,6 @@ const UserDashboard = () => {
       const checkIns = checkInsResponse.data;
 
       const Late = checkIns.filter((checkin)=>checkin.status==="Late")
-      setLateCheckIn(Late.length)
 
       // Fetch check-outs
       const checkOutsResponse = await axios.get(
@@ -58,6 +57,9 @@ const UserDashboard = () => {
         }
       );
       const checkOuts = checkOutsResponse.data;
+      const lateCheckOutsCount = checkOuts.filter((checkin) => checkin.status==="Overtime").length;
+      setLateCheckIn(Late.length-lateCheckOutsCount)
+
 
       // Combine check-ins and check-outs based on date
       const combinedRecords = checkIns.map((checkIn) => {

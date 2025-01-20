@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const Profile = () => {
       toast.error("Passwords do not match.");
       return;
     }
+    setLoading(true);
 
     const updatedUser = { ...user, password: newPassword || user?.password };
 
@@ -42,13 +44,16 @@ const Profile = () => {
         // Update local storage with the updated user data
         localStorage.setItem("user", JSON.stringify(updatedUser));
         setUser(updatedUser);
+        setLoading(false);
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to update profile.");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Something went wrong. Please try again later.");
+      setLoading(false);
     }
   };
 
@@ -142,12 +147,20 @@ const Profile = () => {
         </div>
 
         <div className="text-center mt-6">
-          <button
-            onClick={handleSave}
-            className="w-full py-3 bg-[#e57e38] text-white rounded-md hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
-          >
-            Save Changes
-          </button>
+          {loading ? (
+            <button
+              className="w-full py-3 bg-[#cccccc] text-white rounded-md"
+            >
+              Please wait...
+            </button>
+          ) : (
+            <button
+              onClick={handleSave}
+              className="w-full py-3 bg-[#e57e38] text-white rounded-md hover:bg-black"
+            >
+              Save Changes
+            </button>
+          )}
         </div>
       </div>
     </div>

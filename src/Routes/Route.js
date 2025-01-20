@@ -13,6 +13,7 @@ import LeaveRequestPage from "../Pages/LeaveRequestPage";
 import HistoryPage from "../Pages/HistoryPage";
 import ApplicationsPage from "../Pages/AdminDashboard/ApplicationsPage";
 import UserDashboard from "../Pages/UserDashboard";
+import UserManagementPage from "../Pages/AdminDashboard/Users";
 
 const router = createBrowserRouter([
   {
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/applications",
         element: <ApplicationsPage/>,
+      },
+      {
+        path: "/admin/user",
+        element: <UserManagementPage/>,
       },
     ],
   },

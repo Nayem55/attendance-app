@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../Images/Gvi-logo.png";
 import application from "../Images/Application2.png";
+import admin from "../Images/admin-panel.png";
+import dashboard from "../Images/dashboard.png";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -116,7 +118,7 @@ const Header = () => {
             <p className="font-bold">Profile</p>
           </Link>
           <Link
-            to={user?.role === "super admin" ? "/admin" : "/user-dashboard"}
+            to={"/user-dashboard"}
             className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
             onClick={toggleSidebar}
           >
@@ -124,19 +126,24 @@ const Header = () => {
             <p className="font-bold">Application</p>
           </Link>
           <Link
-            to={user?.role === "super admin" ? "/admin" : "/user-dashboard"}
+            to={"/user-dashboard"}
             className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
             onClick={toggleSidebar}
           >
-            <svg
-              className="w-[32px]"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-            >
-              <path d="M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zm64 64l0 256 160 0 0-256L64 160zm384 0l-160 0 0 256 160 0 0-256z" />
-            </svg>
+            <img className="w-[32px]" alt="" src={dashboard} />
+
             <p className="font-bold">Dashboard</p>
           </Link>
+          {(user?.role !== "MR"||user?.role !== "office") && (
+            <Link
+              to={"/admin"}
+              className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
+              onClick={toggleSidebar}
+            >
+              <img className="w-[32px]" alt="" src={admin} />
+              <p className="font-bold">Admin Panel</p>
+            </Link>
+          )}
         </div>
       </div>
 
