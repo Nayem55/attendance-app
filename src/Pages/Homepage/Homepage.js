@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -21,22 +22,25 @@ const HomePage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const currentMonth = dayjs().format("MMMM");
   const currentYear = dayjs().format("YYYY");
+  const [locationError, setLocationError] = useState("");
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
 
   const fetchUserData = useCallback(async () => {
     if (!storedUser) return;
 
     try {
-      const [userResponse, checkInsResponse, checkOutResponse] = await Promise.all([
-        axios.get(
-          `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?._id}`
-        ),
-        axios.get(
-          `https://attendance-app-server-blue.vercel.app/api/checkins/${storedUser?._id}?month=${currentMonth}&year=${currentYear}`
-        ),
-        axios.get(
-          `https://attendance-app-server-blue.vercel.app/api/checkouts/${storedUser?._id}?month=${currentMonth}&year=${currentYear}`
-        ),
-      ]);
+      const [userResponse, checkInsResponse, checkOutResponse] =
+        await Promise.all([
+          axios.get(
+            `https://attendance-app-server-blue.vercel.app/getUser/${storedUser?._id}`
+          ),
+          axios.get(
+            `https://attendance-app-server-blue.vercel.app/api/checkins/${storedUser?._id}?month=${currentMonth}&year=${currentYear}`
+          ),
+          axios.get(
+            `https://attendance-app-server-blue.vercel.app/api/checkouts/${storedUser?._id}?month=${currentMonth}&year=${currentYear}`
+          ),
+        ]);
 
       const userData = userResponse.data;
       const checkins = checkInsResponse.data;
@@ -54,13 +58,19 @@ const HomePage = () => {
       //   );
       //   return checkInTime.isAfter(lateThreshold);
       // }).length;
-      const lateCheckInsCount = checkins.filter((checkin) => checkin.status==="Late").length;
-      const lateCheckOutsCount = checkouts.filter((checkin) => checkin.status==="Overtime").length;
-      const AbsentCount = checkins.filter((checkin) => checkin.status==="Absent").length;
+      const lateCheckInsCount = checkins.filter(
+        (checkin) => checkin.status === "Late"
+      ).length;
+      const lateCheckOutsCount = checkouts.filter(
+        (checkin) => checkin.status === "Overtime"
+      ).length;
+      const AbsentCount = checkins.filter(
+        (checkin) => checkin.status === "Absent"
+      ).length;
 
       setLateCheckIns(lateCheckInsCount);
       setLateCheckOuts(lateCheckOutsCount);
-      setAbsentCount(AbsentCount)
+      setAbsentCount(AbsentCount);
       setIsCheckedIn(userData.checkIn && userData.lastCheckedIn);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -69,11 +79,56 @@ const HomePage = () => {
     }
   }, [storedUser]);
 
+  const fetchUserLocation = async () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject("Geolocation is not supported by your browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          resolve({ latitude, longitude });
+          setIsLocationEnabled(true); // Set location enabled if successful
+        },
+        (error) => {
+          let errorMessage = "An unknown error occurred.";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage =
+                "Location access denied. Please allow location permissions.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information is unavailable.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Request timed out. Please try again.";
+              setLocationError(errorMessage); // Set the error message
+              setIsLocationEnabled(false); // Set location as not enabled
+              break;
+          }
+          reject(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    });
+  };
+
   useEffect(() => {
     if (!storedUser) {
       navigate("/login");
     } else {
       fetchUserData();
+      fetchUserLocation();
     }
   }, []);
 
@@ -118,11 +173,19 @@ const HomePage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <SummaryCard
             title={`${currentMonth} Attendance`}
-            value={dataLoading ? "Calculating..." : `${totalCheckIns-AbsentCount} Days`}
+            value={
+              dataLoading
+                ? "Calculating..."
+                : `${totalCheckIns - AbsentCount} Days`
+            }
           />
           <SummaryCard
             title={`${currentMonth} Late`}
-            value={dataLoading ? "Calculating..." : `${lateCheckIns-lateCheckOuts} Days`}
+            value={
+              dataLoading
+                ? "Calculating..."
+                : `${lateCheckIns - lateCheckOuts} Days`
+            }
           />
           {/* <SummaryCard
             title={`${currentMonth} Absent`}

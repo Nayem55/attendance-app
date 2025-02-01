@@ -88,10 +88,23 @@ const Profile = () => {
           </label>
           <input
             type="text"
+            readOnly
             id="name"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
             value={user?.name}
-            onChange={(e) => setUser({ ...user, name: e.target.value })}
+            // onChange={(e) => setUser({ ...user, name: e.target.value })}
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-gray-700">
+            Role
+          </label>
+          <input
+            type="text"
+            readOnly
+            id="name"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            value={user?.role}
           />
         </div>
 
@@ -101,10 +114,11 @@ const Profile = () => {
           </label>
           <input
             type="email"
+            readOnly
             id="email"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
             value={user?.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
+            // onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
         </div>
         <div className="mb-4">
@@ -113,14 +127,26 @@ const Profile = () => {
           </label>
           <input
             type="number"
+            readOnly
             id="number"
             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
             value={user?.number}
-            onChange={(e) => setUser({ ...user, number: e.target.value })}
+            // onChange={(e) => setUser({ ...user, number: e.target.value })}
           />
         </div>
 
         <div className="mb-4">
+          <label htmlFor="password" className="block text-gray-700">
+            Password
+          </label>
+          <input
+            type="test"
+            id="password"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            value={user?.password}
+          />
+        </div>
+        {/* <div className="mb-4">
           <label htmlFor="password" className="block text-gray-700">
             New Password
           </label>
@@ -131,9 +157,9 @@ const Profile = () => {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
-        </div>
+        </div> */}
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="confirm-password" className="block text-gray-700">
             Confirm Password
           </label>
@@ -144,9 +170,9 @@ const Profile = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-        </div>
+        </div> */}
 
-        <div className="text-center mt-6">
+        {/**<div className="text-center mt-6">
           {loading ? (
             <button
               className="w-full py-3 bg-[#cccccc] text-white rounded-md"
@@ -161,7 +187,7 @@ const Profile = () => {
               Save Changes
             </button>
           )}
-        </div>
+        </div>**/}
       </div>
     </div>
   );

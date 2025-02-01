@@ -16,8 +16,8 @@ const CheckInPage = () => {
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [captured, setCaptured] = useState(false);
-  const [locationError, setLocationError] = useState(""); // To store location error
-  const [isLocationEnabled, setIsLocationEnabled] = useState(false); // Track if location is enabled
+  const [locationError, setLocationError] = useState("");
+  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -152,7 +152,7 @@ const CheckInPage = () => {
     const location = await fetchUserLocation();
 
     const status =
-      checkInHour > 10 || (checkInHour === 10 && checkInMinute > 15)
+      checkInHour > 11 || (checkInHour === 11 && checkInMinute > 0)
         ? "Late"
         : "Success";
 
@@ -195,7 +195,7 @@ const CheckInPage = () => {
     const location = await fetchUserLocation();
 
     const status =
-    checkOutHour > 20 || (checkOutHour === 20 && checkOutMinute >= 0)
+    checkOutHour > 22 || (checkOutHour === 22 && checkOutMinute >= 0)
         ? "Overtime"
         : "Success";
 
