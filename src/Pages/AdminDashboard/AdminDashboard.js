@@ -240,21 +240,21 @@ const AdminDashboard = () => {
               value={selectedRole}
               onChange={handleRoleChange}
               className="border rounded px-2 py-1"
-            >
-              {storedUser.role === "super admin" && (
+            > 
+              {storedUser?.role === "super admin" && (
                 <option value="office">Office</option>
               )}
-              {storedUser.role === "super admin" && (
+              {storedUser?.role === "super admin" && (
                 <option value="super admin">Super Admin</option>
               )}
-              {(storedUser.role === "super admin" ||
-                storedUser.role === "RSM") && <option value="RSM">RSM</option>}
+              {(storedUser?.role === "super admin" ||
+                storedUser?.role === "RSM") && <option value="RSM">RSM</option>}
 
-              {(storedUser.role === "super admin" || storedUser.role === "RSM" ||
-                storedUser.role === "TSO") && <option value="TSO">TSO</option>}
+              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+                storedUser?.role === "TSO") && <option value="TSO">TSO</option>}
 
-              {(storedUser.role === "super admin" || storedUser.role === "RSM" ||
-                storedUser.role === "ASM") && <option value="ASM">ASM</option>}
+              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+                storedUser?.role === "ASM") && <option value="ASM">ASM</option>}
 
               <option value="MR">MR</option>
             </select>
