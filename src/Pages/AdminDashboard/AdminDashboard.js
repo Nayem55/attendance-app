@@ -250,7 +250,12 @@ const AdminDashboard = () => {
               {(storedUser.role === "super admin" ||
                 storedUser.role === "RSM") && <option value="RSM">RSM</option>}
 
-              <option value="ASM">ASM</option>
+              {(storedUser.role === "super admin" || storedUser.role === "RSM" ||
+                storedUser.role === "TSO") && <option value="TSO">TSO</option>}
+
+              {(storedUser.role === "super admin" || storedUser.role === "RSM" ||
+                storedUser.role === "ASM") && <option value="ASM">ASM</option>}
+
               <option value="MR">MR</option>
             </select>
           </div>

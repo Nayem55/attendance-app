@@ -195,10 +195,9 @@ const CheckInPage = () => {
     const location = await fetchUserLocation();
 
     const status =
-    checkOutHour > 22 || (checkOutHour === 22 && checkOutMinute >= 0)
+      checkOutHour > 22 || (checkOutHour === 22 && checkOutMinute >= 0)
         ? "Overtime"
         : "Success";
-
 
     try {
       const response = await axios.post(
@@ -245,7 +244,7 @@ const CheckInPage = () => {
           </>
         )}
         <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-        {!captured ? (
+        {/* {!captured ? (
           <button
             onClick={handleCapture}
             className="w-full mt-4 bg-[#e57e38] text-white py-2 rounded-lg"
@@ -260,7 +259,14 @@ const CheckInPage = () => {
           >
             Retake
           </button>
-        )}
+        )} */}
+        <button
+          onClick={handleCapture}
+          className="w-full mt-4 bg-[#e57e38] text-white py-2 rounded-lg"
+          disabled={loading} // Disable button while loading
+        >
+          {loading ? "Please wait..." : "Capture Image"}
+        </button>
         {image && <img src={image} alt="Captured Check-In" className="mt-2" />}
       </div>
       <div className="mb-6">
