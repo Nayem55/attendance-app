@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
+  const [group, setGroup] = useState("NMT");
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
   const [selectedRole, setSelectedRole] = useState("MR"); // Default to 'office'
@@ -27,11 +28,11 @@ const AdminDashboard = () => {
     fetchUserReports(
       selectedMonth,
       selectedRole,
-      storedUser.group,
+      storedUser.group || (selectedRole === "super admin" ? "" : group),
       storedUser.zone
     ); // Add role to the dependency
     fetchPendingRequest();
-  }, [selectedMonth, selectedRole]);
+  }, [selectedMonth, selectedRole, group]);
 
   const fetchPendingRequest = async () => {
     try {
@@ -234,13 +235,28 @@ const AdminDashboard = () => {
               className="border rounded px-2 py-1"
             />
           </div>
+          {storedUser?.role === "super admin" && (
+            <div>
+              <label className="mr-2 font-semibold">Filter by Group:</label>
+              <select
+                value={group}
+                onChange={(e) => setGroup(e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                <option value="NMT">NMT</option>
+                <option value="AMD">AMD</option>
+                <option value="GVI">GVI</option>
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="mr-2 font-semibold">Filter by User Role:</label>
             <select
               value={selectedRole}
               onChange={handleRoleChange}
               className="border rounded px-2 py-1"
-            > 
+            >
               {storedUser?.role === "super admin" && (
                 <option value="office">Office</option>
               )}
@@ -250,10 +266,12 @@ const AdminDashboard = () => {
               {(storedUser?.role === "super admin" ||
                 storedUser?.role === "RSM") && <option value="RSM">RSM</option>}
 
-              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+              {(storedUser?.role === "super admin" ||
+                storedUser?.role === "RSM" ||
                 storedUser?.role === "TSO") && <option value="TSO">TSO</option>}
 
-              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+              {(storedUser?.role === "super admin" ||
+                storedUser?.role === "RSM" ||
                 storedUser?.role === "ASM") && <option value="ASM">ASM</option>}
 
               <option value="MR">MR</option>
