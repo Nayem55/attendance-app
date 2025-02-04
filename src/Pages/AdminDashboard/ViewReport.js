@@ -63,6 +63,8 @@ const ViewReport = () => {
           checkInId: checkIn._id,
           date: dayjs(checkIn?.time).format("DD MMMM YYYY"),
           checkInTime: dayjs(checkIn?.time).format("hh:mm A") || "N/A",
+          checkInLocation: checkIn?.location,
+          checkOutLocation: checkOut?.location,
           checkInNote: checkIn?.note || "N/A",
           checkOutTime: dayjs(checkOut?.time).format("hh:mm A") || "N/A",
           checkOutNote: checkOut?.note || "N/A",
@@ -210,10 +212,16 @@ const ViewReport = () => {
                     Check-In Note
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
+                    Check-In Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
                     Check-Out Time
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
                     Check-Out Note
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Check-Out Location
                   </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
                   <th className="border border-gray-300 px-4 py-2">
@@ -233,14 +241,21 @@ const ViewReport = () => {
                     <td className="border border-gray-300 px-4 py-2">
                       {record.checkInTime}
                     </td>
+
                     <td className="border border-gray-300 px-4 py-2">
                       {record.checkInNote}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {record.checkInLocation}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {record.checkOutTime || "N/A"}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {record.checkOutNote || "N/A"}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {record.checkOutLocation || "N/A"}
                     </td>
                     <td
                       className={`border border-gray-300 font-bold px-4 py-2 ${
