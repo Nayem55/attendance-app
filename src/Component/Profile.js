@@ -90,7 +90,7 @@ const Profile = () => {
             type="text"
             readOnly
             id="name"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={user?.name}
             // onChange={(e) => setUser({ ...user, name: e.target.value })}
           />
@@ -103,7 +103,7 @@ const Profile = () => {
             type="text"
             readOnly
             id="name"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={user?.role}
           />
         </div>
@@ -116,7 +116,7 @@ const Profile = () => {
             type="email"
             readOnly
             id="email"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={user?.email}
             // onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
@@ -129,7 +129,7 @@ const Profile = () => {
             type="number"
             readOnly
             id="number"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={user?.number}
             // onChange={(e) => setUser({ ...user, number: e.target.value })}
           />
@@ -142,7 +142,7 @@ const Profile = () => {
           <input
             type="test"
             id="password"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={user?.password}
           />
         </div>
@@ -153,7 +153,7 @@ const Profile = () => {
           <input
             type="password"
             id="password"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
@@ -166,7 +166,7 @@ const Profile = () => {
           <input
             type="password"
             id="confirm-password"
-            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e57e38]"
+            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#002B54]"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -182,7 +182,7 @@ const Profile = () => {
           ) : (
             <button
               onClick={handleSave}
-              className="w-full py-3 bg-[#e57e38] text-white rounded-md hover:bg-black"
+              className="w-full py-3 bg-[#002B54] text-white rounded-md hover:bg-black"
             >
               Save Changes
             </button>

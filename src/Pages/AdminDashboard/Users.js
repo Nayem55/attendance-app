@@ -6,7 +6,16 @@ import toast from "react-hot-toast";
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", number: "", password:"", role:"", group:"", zone:"", outlet:"" });
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    number: "",
+    password: "",
+    role: "",
+    group: "",
+    zone: "",
+    outlet: "",
+  });
   const [isAddUserVisible, setIsAddUserVisible] = useState(false);
   const [updateUser, setUpdateUser] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -34,9 +43,9 @@ const UserManagementPage = () => {
         "https://attendance-app-server-blue.vercel.app/api/users",
         newUser
       );
-        toast.success("User created successfully!");
-        // setNewUser({ name: "", email: "", number: "", password: "", role: "", group: "", zone: "", outlet: "" });
-        // fetchUsers();
+      toast.success("User created successfully!");
+      // setNewUser({ name: "", email: "", number: "", password: "", role: "", group: "", zone: "", outlet: "" });
+      // fetchUsers();
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error("Failed to create user.");
@@ -150,7 +159,7 @@ const UserManagementPage = () => {
           <h1 className="text-2xl font-bold">User Management</h1>
           <button
             onClick={() => setIsAddUserVisible(!isAddUserVisible)}
-            className="px-4 py-2 bg-[#E57E38] hover:bg-black text-white rounded"
+            className="px-4 py-2 bg-[#002B54] hover:bg-black text-white rounded"
           >
             {isAddUserVisible ? "Hide Form" : "Add User"}
           </button>
@@ -307,7 +316,7 @@ const UserManagementPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full p-3 bg-[#E57E38] hover:bg-black text-white rounded ${
+              className={`w-full p-3 bg-[#002B54] hover:bg-black text-white rounded ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -343,9 +352,9 @@ const UserManagementPage = () => {
                     <td className="border p-2">{user.number}</td>
                     <td className="border p-2">{user.password}</td>
                     <td className="border p-2">{user.role}</td>
-                    <td className="border p-2">{user.group||""}</td>
-                    <td className="border p-2">{user.zone||""}</td>
-                    <td className="border p-2">{user.outlet||""}</td>
+                    <td className="border p-2">{user.group || ""}</td>
+                    <td className="border p-2">{user.zone || ""}</td>
+                    <td className="border p-2">{user.outlet || ""}</td>
                     <td className="border p-2">
                       <button
                         onClick={() => setUpdateUser(user)}

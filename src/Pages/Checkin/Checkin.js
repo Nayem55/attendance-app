@@ -247,7 +247,7 @@ const CheckInPage = () => {
         {/* {!captured ? (
           <button
             onClick={handleCapture}
-            className="w-full mt-4 bg-[#e57e38] text-white py-2 rounded-lg"
+            className="w-full mt-4 bg-[#002B54] text-white py-2 rounded-lg"
             disabled={loading} // Disable button while loading
           >
             {loading ? "Please wait..." : "Capture Image"}
@@ -262,7 +262,7 @@ const CheckInPage = () => {
         )} */}
         <button
           onClick={handleCapture}
-          className="w-full mt-4 bg-[#e57e38] text-white py-2 rounded-lg"
+          className="w-full mt-4 bg-[#002B54] text-white py-2 rounded-lg"
           disabled={loading} // Disable button while loading
         >
           {loading ? "Please wait..." : "Capture Image"}
@@ -299,7 +299,7 @@ const CheckInPage = () => {
         {user && user?.checkIn ? (
           <button
             className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${
-              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#e57e38]"
+              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#002B54]"
             }`}
             onClick={handleCheckOut}
             disabled={loading || !isLocationEnabled}
@@ -313,7 +313,7 @@ const CheckInPage = () => {
         ) : (
           <button
             className={`w-full text-white py-2 px-4 rounded-lg mt-2 ${
-              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#e57e38]"
+              !isLocationEnabled ? "bg-[#cccccc]" : "bg-[#002B54]"
             }`}
             onClick={handleCheckIn}
             disabled={loading || !isLocationEnabled}

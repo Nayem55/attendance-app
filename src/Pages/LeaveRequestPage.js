@@ -62,7 +62,10 @@ const LeaveRequestPage = () => {
     <div className="p-4 md:p-6 bg-gray-100 py-10">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">Request Leave</h1>
-        <Link to="/leave-history" className="text-sm bg-black hover:bg-[#E57E38] ease-in-out duration-200 text-[#ffffff] px-3 py-2 rounded font-bold mb-4">
+        <Link
+          to="/leave-history"
+          className="text-sm bg-black hover:bg-[#002B54] ease-in-out duration-200 text-[#ffffff] px-3 py-2 rounded font-bold mb-4"
+        >
           History
         </Link>
       </div>
@@ -168,7 +171,7 @@ const LeaveRequestPage = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full p-3 bg-[#E57E38] hover:bg-black ease-in-out duration-200 mb-10 text-white rounded ${
+          className={`w-full p-3 bg-[#002B54] hover:bg-black ease-in-out duration-200 mb-10 text-white rounded ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

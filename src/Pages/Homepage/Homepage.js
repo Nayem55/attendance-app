@@ -161,7 +161,7 @@ const HomePage = () => {
         <p className="text-xl text-[#000] font-semibold">Reminder</p>
         <Link
           to="/check-in"
-          className="sm:w-auto bg-[#e57e38] text-white py-2 px-4 rounded-lg mt-2 block text-center font-bold"
+          className="sm:w-auto bg-[#002B54] text-white py-2 px-4 rounded-lg mt-2 block text-center font-bold"
         >
           {user?.checkIn ? "Complete Your Checkout" : "Complete Your Check-in"}
         </Link>
@@ -205,7 +205,7 @@ const HomePage = () => {
           />
         </div>
 
-        <div className="p-4 rounded-lg mt-6 bg-[#E57E38] text-white">
+        <div className="p-4 rounded-lg mt-6 bg-[#002B54] text-white">
           <h4 className="font-bold">Total Working Hours</h4>
           <p className="text-xl mt-4 font-semibold">{totalWorkingHours}</p>
         </div>

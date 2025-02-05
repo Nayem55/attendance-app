@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../Images/Gvi-logo.png";
+import gvilogo from "../Images/Gvi-logo.png";
+import amdlogo from "../Images/Amd-logo.png";
 import application from "../Images/Application2.png";
 import admin from "../Images/admin-panel.png";
 import dashboard from "../Images/dashboard.png";
@@ -18,7 +19,11 @@ const Header = () => {
       {/* Header */}
       <div className="flex top-0 justify-between items-center p-4 bg-[#ffffff] shadow-md">
         <Link to="/">
-          <img className="w-[60px]" src={logo} alt="Logo" />
+          <img
+            className={`${user?.group === "GVI" ? "w-[60px]" : "w-[80px]"}`}
+            src={user?.group === "GVI" ? gvilogo : amdlogo}
+            alt="Logo"
+          />
         </Link>
         <div className="flex items-center gap-4">
           <button
@@ -49,7 +54,7 @@ const Header = () => {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out z-50`}
       >
-        <div className="flex justify-between items-center p-4 bg-[#e57e38] text-white">
+        <div className="flex justify-between items-center p-4 bg-[#002B54] text-white">
           <h2 className="text-lg font-bold">{user ? user?.name : "Menu"}</h2>
           <button
             className="text-white text-xl focus:outline-none"
@@ -118,7 +123,7 @@ const Header = () => {
             <p className="font-bold">Profile</p>
           </Link>
           <Link
-            to={"/user-dashboard"}
+            to={"/leave-request"}
             className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
             onClick={toggleSidebar}
           >
@@ -134,7 +139,7 @@ const Header = () => {
 
             <p className="font-bold">Dashboard</p>
           </Link>
-          {(user?.role !== "MR"||user?.role !== "office") && (
+          {(user?.role !== "MR" || user?.role !== "office") && (
             <Link
               to={"/admin"}
               className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md flex gap-4 items-center"
