@@ -63,7 +63,7 @@ const LoginForm = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <input
-              type="number"
+              type="text"
               name="number"
               value={formData.number}
               onChange={handleChange}
