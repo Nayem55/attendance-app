@@ -11,6 +11,7 @@ const TodaysReport = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [updatedStatuses, setUpdatedStatuses] = useState({});
+  const [group, setGroup] = useState("NMT");
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("YYYY-MM-DD")
   );
@@ -25,8 +26,13 @@ const TodaysReport = () => {
   }, []);
 
   useEffect(() => {
-    fetchReports(selectedDate, selectedRole, storedUser.group, storedUser.zone);
-  }, [selectedDate, selectedRole]);
+    fetchReports(
+      selectedDate,
+      selectedRole,
+      storedUser.group || (selectedRole === "super admin" ? "" : group),
+      storedUser.zone
+    );
+  }, [selectedDate, selectedRole, group]);
 
   const fetchReports = async (date, role, group, zone) => {
     setLoading(true);
@@ -221,6 +227,21 @@ const TodaysReport = () => {
             />
           </div>
 
+          {storedUser?.role === "super admin" && (
+              <div className="mb-4 w-[100%]">
+                <label className="block text-gray-700 font-bold mb-2">Filter by Group:</label>
+                <select
+                  value={group}
+                  onChange={(e) => setGroup(e.target.value)}
+                  className="border rounded px-2 py-1"
+                >
+                  <option value="NMT">NMT</option>
+                  <option value="AMD">AMD</option>
+                  <option value="GVI">GVI</option>
+                </select>
+              </div>
+            )}
+
           <div className="mb-4 w-[100%]">
             <label className="block text-gray-700 font-bold mb-2">
               Select Role:
@@ -239,12 +260,14 @@ const TodaysReport = () => {
               {(storedUser?.role === "super admin" ||
                 storedUser?.role === "RSM") && <option value="RSM">RSM</option>}
 
-              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+              {(storedUser?.role === "super admin" ||
+                storedUser?.role === "RSM" ||
                 storedUser?.role === "TSO") && <option value="TSO">TSO</option>}
 
-              {(storedUser?.role === "super admin" || storedUser?.role === "RSM" ||
+              {(storedUser?.role === "super admin" ||
+                storedUser?.role === "RSM" ||
                 storedUser?.role === "ASM") && <option value="ASM">ASM</option>}
-                
+
               <option value="MR">MR</option>
             </select>
           </div>

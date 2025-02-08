@@ -224,7 +224,7 @@ const AdminDashboard = () => {
           {isDrawerOpen ? "Close Menu" : "Open Menu"}
         </button>
 
-        <h1 className="text-xl font-bold mb-4">Monthly Report</h1>
+        <h1 className="text-xl font-bold mb-4">Monthly Attendance Report</h1>
         <div className="mb-4 flex items-center space-x-4">
           <div>
             <label className="mr-2 font-semibold">Select Month:</label>
