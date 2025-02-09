@@ -114,28 +114,28 @@ const UserManagementPage = () => {
         </div>
         <nav className="flex flex-col p-4 space-y-2">
           <Link
-            to="/admin"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Attendance Report
-          </Link>
-          <Link
             to="/admin/today-report"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Today's Report
           </Link>
           <Link
-            to="/admin/holiday-management"
+            to="/admin/monthly-summary"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
-            Holiday
+            Monthly Summary
+          </Link>
+          <Link
+            to="/admin/monthly-details"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
+            Monthly Details
           </Link>
           <Link
             to="/admin/applications"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700 flex items-center"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
-            Leave Requests{" "}
+            Leave Requests
           </Link>
           <Link
             to="/admin/user"
@@ -274,7 +274,6 @@ const UserManagementPage = () => {
                 onChange={(e) =>
                   setNewUser({ ...newUser, group: e.target.value })
                 }
-                required
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
@@ -292,7 +291,6 @@ const UserManagementPage = () => {
                 onChange={(e) =>
                   setNewUser({ ...newUser, zone: e.target.value })
                 }
-                required
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>

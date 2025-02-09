@@ -84,6 +84,7 @@ const TodaysReport = () => {
           return {
             username: user.name,
             number: user.number,
+            zone: user.zone || "",
             checkInTime: latestCheckIn
               ? dayjs(latestCheckIn.time).format("hh:mm A")
               : "N/A",
@@ -171,22 +172,22 @@ const TodaysReport = () => {
         </div>
         <nav className="flex flex-col p-4 space-y-2">
           <Link
-            to="/admin"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Attendance Report
-          </Link>
-          <Link
             to="/admin/today-report"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
             Today's Report
           </Link>
           <Link
-            to="/admin/holiday-management"
+            to="/admin/monthly-summary"
             className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
           >
-            Holiday
+            Monthly Summary
+          </Link>
+          <Link
+            to="/admin/monthly-details"
+            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+          >
+            Monthly Details
           </Link>
           <Link
             to="/admin/applications"
@@ -284,6 +285,7 @@ const TodaysReport = () => {
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
                   <th className="border border-gray-300 px-4 py-2">Phone</th>
+                  <th className="border border-gray-300 px-4 py-2">Zone</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Check-in Time
                   </th>
@@ -325,6 +327,9 @@ const TodaysReport = () => {
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report.number}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {report.zone}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {report?.status !== "Absent" && report.checkInTime}

@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Import the xlsx library
 
-const AdminDashboard = () => {
+const DetailedSummary = () => {
   const [reports, setReports] = useState([]);
   const [group, setGroup] = useState("NMT");
   const [loading, setLoading] = useState(true);
@@ -112,33 +112,33 @@ const AdminDashboard = () => {
 
           const checkIns = checkInsResponse.data;
           const checkOuts = checkOutsResponse.data;
-          const totalCheckIns = checkIns.length;
 
-          const lateCheckInsCount = checkIns.filter(
-            (checkin) => checkin.status === "Late"
-          ).length;
-          const lateCheckOutsCount = checkOuts.filter(
-            (checkin) => checkin.status === "Overtime"
-          ).length;
+          // Create an object to store daily check-in/check-out times
+          const dailyTimes = {};
+          for (let day = 1; day <= dayCount; day++) {
+            const date = `${year}-${monthNumber}-${String(day).padStart(
+              2,
+              "0"
+            )}`;
+            const checkIn = checkIns.find(
+              (checkin) => dayjs(checkin.time).format("YYYY-MM-DD") === date
+            );
+            const checkOut = checkOuts.find(
+              (checkout) => dayjs(checkout.time).format("YYYY-MM-DD") === date
+            );
 
-          const approvedLeaveDays = await fetchApprovedLeaves(
-            user._id,
-            monthNumber,
-            year
-          );
+            dailyTimes[day] = {
+              in: checkIn ? dayjs(checkIn.time).format("hh:mm A") : "",
+              out: checkOut ? dayjs(checkOut.time).format("hh:mm A") : "",
+            };
+          }
 
           return {
             username: user.name,
             number: user.number,
-            role: user.role,
-            userId: user._id,
-            totalCheckIns,
-            lateCheckIns: lateCheckInsCount,
-            lateCheckOuts: lateCheckOutsCount,
-            approvedLeaves: approvedLeaveDays,
-            month: monthNumber,
-            year: year,
+            outlet: user.outlet || "N/A", // Assuming outlet is part of user data
             zone: user.zone,
+            dailyTimes,
           };
         })
       );
@@ -159,40 +159,51 @@ const AdminDashboard = () => {
     setSelectedRole(event.target.value);
   };
 
-  // Function to export the report to Excel
+  // Function to export the report to Excel in the desired format
   const exportToExcel = () => {
-    const worksheetData = reports.map((report) => ({
-      Name: report.username,
-      Number: report.number,
-      Role: report.role,
-      Zone: report.zone,
-      "Total Working Days": totalWorkingDays,
-      Holidays:
-        dayCount -
-        totalWorkingDays -
-        (report.totalCheckIns - totalWorkingDays > 0
-          ? report.totalCheckIns - totalWorkingDays
-          : 0),
-      "Approved Leave": report.approvedLeaves,
-      Absent:
-        totalWorkingDays - report.totalCheckIns - report.approvedLeaves > 0
-          ? totalWorkingDays - report.totalCheckIns - report.approvedLeaves
-          : 0,
-      "Extra Day":
-        report.totalCheckIns - totalWorkingDays > 0
-          ? report.totalCheckIns - totalWorkingDays
-          : 0,
-      "Total Check-Ins": report.totalCheckIns,
-      "Late Check-Ins (10.15 AM)": report.lateCheckIns,
-      "Late Check-Outs (8.00 PM)": report.lateCheckOuts,
-      "Late Adjustment": report.lateCheckIns - report.lateCheckOuts,
-    }));
+    const worksheetData = [];
 
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    // Add headers
+    const headers = ["Name", "Number", "Outlet", "Zone"];
+    for (let day = 1; day <= dayCount; day++) {
+      headers.push(day);
+      headers.push(""); // Empty cell for merged "In" and "Out"
+    }
+    worksheetData.push(headers);
+
+    // Add sub-headers for "In" and "Out"
+    const subHeaders = ["", "", "", ""];
+    for (let day = 1; day <= dayCount; day++) {
+      subHeaders.push("In", "Out");
+    }
+    worksheetData.push(subHeaders);
+
+    // Add employee data
+    reports.forEach((report) => {
+      const row = [report.username, report.number, report.outlet, report.zone];
+      for (let day = 1; day <= dayCount; day++) {
+        row.push(report.dailyTimes[day].in, report.dailyTimes[day].out);
+      }
+      worksheetData.push(row);
+    });
+
+    // Create worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Merge date headers
+    for (let day = 1; day <= dayCount; day++) {
+      const startCol = 4 + (day - 1) * 2;
+      const endCol = startCol + 1;
+      worksheet["!merges"] = worksheet["!merges"] || [];
+      worksheet["!merges"].push({
+        s: { r: 0, c: startCol },
+        e: { r: 0, c: endCol },
+      });
+    }
+
+    // Create workbook and trigger download
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Monthly Report");
-
-    // Generate Excel file and trigger download
     XLSX.writeFile(workbook, `Monthly_Report_${selectedMonth}.xlsx`);
   };
 
@@ -200,7 +211,7 @@ const AdminDashboard = () => {
     <div className="flex">
       {/* Side Drawer */}
       <div
-        className={`fixed md:relative z-20 bg-gray-800 text-white w-64 h-screen transform ${
+        className={`fixed md:relative z-20 bg-gray-800 text-white min-w-64 h-screen transform ${
           isDrawerOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300`}
       >
@@ -330,36 +341,30 @@ const AdminDashboard = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-2">Username</th>
-                  <th className="border border-gray-300 px-4 py-2">Role</th>
+                  <th className="border border-gray-300 px-4 py-2">Number</th>
+                  <th className="border border-gray-300 px-4 py-2">Outlet</th>
                   <th className="border border-gray-300 px-4 py-2">Zone</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Total Working Days
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Holidays</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Approved Leave
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">
-                    Absent
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 bg-[#0B6222] text-white">
-                    Extra Day
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Total Check-Ins
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 bg-red-500 text-white">
-                    Late Check-Ins (10.15 AM)
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2 bg-[#0B6222] text-white">
-                    Late Check-Outs (8.00 PM)
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Late Adjustment
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Daily Report
-                  </th>
+                  {Array.from({ length: dayCount }, (_, i) => (
+                    <th
+                      key={i + 1}
+                      colSpan={2}
+                      className="border border-gray-300 px-4 py-2"
+                    >
+                      {i + 1}
+                    </th>
+                  ))}
+                </tr>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-300 px-4 py-2"></th>
+                  <th className="border border-gray-300 px-4 py-2"></th>
+                  <th className="border border-gray-300 px-4 py-2"></th>
+                  <th className="border border-gray-300 px-4 py-2"></th>
+                  {Array.from({ length: dayCount }, (_, i) => (
+                    <React.Fragment key={i + 1}>
+                      <th className="border border-gray-300 px-4 py-2">In</th>
+                      <th className="border border-gray-300 px-4 py-2">Out</th>
+                    </React.Fragment>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -369,56 +374,24 @@ const AdminDashboard = () => {
                       {report.username}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report?.role}
+                      {report.number}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {report?.zone}
+                      {report.outlet}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {totalWorkingDays}
+                      {report.zone}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {dayCount -
-                        totalWorkingDays -
-                        (report.totalCheckIns - totalWorkingDays > 0
-                          ? report.totalCheckIns - totalWorkingDays
-                          : 0)}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {report.approvedLeaves}
-                    </td>
-                    <td className="border border-gray-300  bg-red-300 px-4 py-2">
-                      {totalWorkingDays -
-                        report.totalCheckIns -
-                        report.approvedLeaves >
-                      0
-                        ? totalWorkingDays -
-                          report.totalCheckIns -
-                          report.approvedLeaves
-                        : 0}
-                    </td>
-                    <td className="border border-gray-300 bg-[#9BB97F] px-4 py-2">
-                      {report.totalCheckIns - totalWorkingDays > 0
-                        ? report.totalCheckIns - totalWorkingDays
-                        : 0}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {report.totalCheckIns}
-                    </td>
-                    <td className="border border-gray-300 bg-red-300 px-4 py-2">
-                      {report.lateCheckIns}
-                    </td>
-                    <td className="border border-gray-300 bg-[#9BB97F]  px-4 py-2">
-                      {report.lateCheckOuts}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {report.lateCheckIns - report.lateCheckOuts}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <Link to={`/admin/view-report/${report.userId}`}>
-                        View Report
-                      </Link>
-                    </td>
+                    {Array.from({ length: dayCount }, (_, i) => (
+                      <React.Fragment key={i + 1}>
+                        <td className="border border-gray-300 px-4 py-2">
+                          {report.dailyTimes[i + 1]?.in}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          {report.dailyTimes[i + 1]?.out}
+                        </td>
+                      </React.Fragment>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -432,4 +405,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default DetailedSummary;
