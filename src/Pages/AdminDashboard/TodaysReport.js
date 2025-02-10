@@ -214,6 +214,7 @@ const TodaysReport = () => {
         </button>
 
         <h1 className="text-xl font-bold mb-4">Today's Report</h1>
+         <p className="mb-6 font-bold text-[#0DC180]">Total Check In : {todaysReports?.length}</p>
 
         <div className="flex gap-10 w-[80%]">
           <div className="mb-4 w-[100%]">
@@ -229,19 +230,21 @@ const TodaysReport = () => {
           </div>
 
           {storedUser?.role === "super admin" && (
-              <div className="mb-4 w-[100%]">
-                <label className="block text-gray-700 font-bold mb-2">Filter by Group:</label>
-                <select
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value)}
-                  className="border rounded px-2 py-1"
-                >
-                  <option value="NMT">NMT</option>
-                  <option value="AMD">AMD</option>
-                  <option value="GVI">GVI</option>
-                </select>
-              </div>
-            )}
+            <div className="mb-4 w-[100%]">
+              <label className="block text-gray-700 font-bold mb-2">
+                Filter by Group:
+              </label>
+              <select
+                value={group}
+                onChange={(e) => setGroup(e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                <option value="NMT">NMT</option>
+                <option value="AMD">AMD</option>
+                <option value="GVI">GVI</option>
+              </select>
+            </div>
+          )}
 
           <div className="mb-4 w-[100%]">
             <label className="block text-gray-700 font-bold mb-2">
