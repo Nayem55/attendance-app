@@ -384,10 +384,10 @@ const DetailedSummary = () => {
                     </td>
                     {Array.from({ length: dayCount }, (_, i) => (
                       <React.Fragment key={i + 1}>
-                        <td className="border border-gray-300 px-4 py-2">
+                        <td className="border border-gray-300 px-4 py-2 bg-green-300">
                           {report.dailyTimes[i + 1]?.in}
                         </td>
-                        <td className="border border-gray-300 px-4 py-2">
+                        <td className="border border-gray-300 px-4 py-2 bg-red-300">
                           {report.dailyTimes[i + 1]?.out}
                         </td>
                       </React.Fragment>
