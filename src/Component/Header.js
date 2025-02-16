@@ -14,8 +14,6 @@ const Header = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  console.log(user.role)
-
   return (
     <div>
       {/* Header */}
