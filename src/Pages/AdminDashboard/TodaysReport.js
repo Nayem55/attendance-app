@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx"; // Import the xlsx library
 
 const TodaysReport = () => {
   const [todaysReports, setTodaysReports] = useState([]);
@@ -153,6 +154,31 @@ const TodaysReport = () => {
     setSelectedImage(null);
   };
 
+  const exportToExcel = () => {
+    const worksheetData = todaysReports.map((report) => ({
+      Name: report.username,
+      Number: report.number,
+      Role: selectedRole,
+      Zone: report.zone,
+      "Check-in Time": report.checkInTime,
+      "Check-out Time": report.checkOutTime,
+      "Total Work Time": report.totalWorkTime,
+      "Check-in Location": report.checkInLocation,
+      "Check-out Location": report.checkOutLocation,
+      "Check-in Image": report.checkInImage,
+      "Check-out Image": report.checkOutImage,
+      "Status" : report.status
+
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Daily Report");
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, `Daily_Report.xlsx`);
+  };
+
   return (
     <div className="flex">
       {/* Side Drawer */}
@@ -214,7 +240,16 @@ const TodaysReport = () => {
         </button>
 
         <h1 className="text-xl font-bold mb-4">Today's Report</h1>
-         <p className="mb-6 font-bold text-[#0DC180]">Total Check In : {todaysReports?.length}</p>
+        <p className="mb-6 font-bold text-[#0DC180]">
+          Total Check In : {todaysReports?.length}
+        </p>
+         {/* Export Button */}
+         <button
+          onClick={exportToExcel}
+          className="mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Export Report
+        </button>
 
         <div className="flex gap-10 w-[80%]">
           <div className="mb-4 w-[100%]">
