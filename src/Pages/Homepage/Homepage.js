@@ -88,6 +88,7 @@ const HomePage = () => {
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log(position)
           const { latitude, longitude } = position.coords;
           resolve({ latitude, longitude });
           setIsLocationEnabled(true); // Set location enabled if successful

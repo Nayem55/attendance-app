@@ -306,7 +306,7 @@ const DetailedSummary = () => {
             <label className="mr-2 font-semibold">Filter by User Role:</label>
             <select
               value={selectedRole}
-              onChange={handleRoleChange}
+              onChange={handleRoleChange} 
               className="border rounded px-2 py-1"
             >
               {storedUser?.role === "super admin" && (
@@ -406,3 +406,4 @@ const DetailedSummary = () => {
 };
 
 export default DetailedSummary;
+

@@ -99,7 +99,7 @@ const CheckInPage = () => {
     startCamera();
   }, []);
 
-  const handleCapture = async () => {
+  const handleCapture = async (key) => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     const video = videoRef.current;
@@ -116,7 +116,7 @@ const CheckInPage = () => {
 
       try {
         const response = await axios.post(
-          "https://api.imgbb.com/1/upload?expiration=172800&key=293a0c42ccc6a11a4d90a9b7974dbb60",
+          `https://api.imgbb.com/1/upload?expiration=172800&key=${key}`,
           formData
         );
         const imageUrl = response.data.data.url;
@@ -261,12 +261,19 @@ const CheckInPage = () => {
           </button>
         )} */}
         <button
-          onClick={handleCapture}
+          onClick={() =>
+            handleCapture(
+              user && user?.checkIn
+                ? "42b2971fb82923a7fcefaed33eb5ecea"
+                : "b2881404f47f937001e778346741f5b5"
+            )
+          }
           className="w-full mt-4 bg-[#002B54] text-white py-2 rounded-lg"
           disabled={loading} // Disable button while loading
         >
           {loading ? "Please wait..." : "Capture Image"}
         </button>
+
         {image && <img src={image} alt="Captured Check-In" className="mt-2" />}
       </div>
       <div className="mb-6">
