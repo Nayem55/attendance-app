@@ -17,7 +17,7 @@ const CheckInPage = () => {
   const [loading, setLoading] = useState(false);
   const [captured, setCaptured] = useState(false);
   const [locationError, setLocationError] = useState("");
-  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
+  const [isLocationEnabled, setIsLocationEnabled] = useState(true);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -37,37 +37,52 @@ const CheckInPage = () => {
   const fetchUserLocation = async () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject("Geolocation is not supported by your browser.");
+        const errorMessage = "Geolocation is not supported by your browser.";
+        setLocationError(errorMessage);
+        reject(errorMessage);
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          // setIsLocationEnabled(true);
           resolve({ latitude, longitude });
-          setIsLocationEnabled(true); // Set location enabled if successful
         },
-        (error) => {
+        async (error) => {
           let errorMessage = "An unknown error occurred.";
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage =
                 "Location access denied. Please allow location permissions.";
-              setLocationError(errorMessage); // Set the error message
-              setIsLocationEnabled(false); // Set location as not enabled
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = "Location information is unavailable.";
-              setLocationError(errorMessage); // Set the error message
-              setIsLocationEnabled(false); // Set location as not enabled
               break;
             case error.TIMEOUT:
               errorMessage = "Request timed out. Please try again.";
-              setLocationError(errorMessage); // Set the error message
-              setIsLocationEnabled(false); // Set location as not enabled
               break;
           }
-          reject(errorMessage);
+
+          setLocationError(errorMessage);
+          console.warn(errorMessage);
+
+          // **Fallback: Fetch location using IP-based Geolocation (ipinfo.io)**
+          try {
+            console.log("Fetching location from IPInfo.io...");
+            const res = await axios.get(
+              "https://ipinfo.io/json?token=6cc3a1d32d5129"
+            );
+            const [latitude, longitude] = res.data.loc.split(",");
+            resolve({ latitude, longitude });
+            // setIsLocationEnabled(true);
+          } catch (ipError) {
+            const fallbackError =
+              "Failed to retrieve location from both GPS and IP.";
+            // setIsLocationEnabled(false)
+            setLocationError(fallbackError);
+            reject(fallbackError);
+          }
         },
         {
           enableHighAccuracy: true,
@@ -80,7 +95,7 @@ const CheckInPage = () => {
 
   useEffect(() => {
     fetchCurrentTime();
-    fetchUserLocation();
+    // fetchUserLocation();
   }, []);
 
   useEffect(() => {
@@ -339,7 +354,16 @@ const CheckInPage = () => {
             }}
             className="mt-2 font-bold py-1 px-2 bg-[#002B54] rounded"
           >
-            <svg className="w-7 h-7 p-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#ffffff" d="M463.5 224l8.5 0c13.3 0 24-10.7 24-24l0-128c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8l119.5 0z"/></svg>
+            <svg
+              className="w-7 h-7 p-1"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+            >
+              <path
+                fill="#ffffff"
+                d="M463.5 224l8.5 0c13.3 0 24-10.7 24-24l0-128c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8l119.5 0z"
+              />
+            </svg>
           </button>
         )}
       </div>
@@ -348,8 +372,6 @@ const CheckInPage = () => {
 };
 
 export default CheckInPage;
-
-
 
 // luvitbd
 // ebay
