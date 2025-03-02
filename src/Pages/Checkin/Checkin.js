@@ -322,7 +322,7 @@ const CheckInPage = () => {
           <button
             className={`w-full text-white py-2 px-4 rounded-lg mt-2 bg-[#002B54]`}
             onClick={handleCheckOut}
-            disabled={loading || !isLocationEnabled}
+            disabled={loading}
           >
             {loading ? "Please wait..." : "Check Out"}
           </button>
@@ -330,7 +330,7 @@ const CheckInPage = () => {
           <button
             className={`w-full text-white py-2 px-4 rounded-lg mt-2 bg-[#002B54]`}
             onClick={handleCheckIn}
-            disabled={loading || !isLocationEnabled}
+            disabled={loading}
           >
             {loading ? "Please wait..." : "Check In"}
           </button>
