@@ -18,9 +18,12 @@ const LeaveRequestPage = () => {
     setLoading(true);
 
     const leaveData = {
-      userName: user.name,
-      userId: user._id,
-      phoneNumber: user.number,
+      userName: user?.name,
+      group: user?.group || "",
+      zone: user?.zone || "",
+      role: user?.role || "",
+      userId: user?._id,
+      phoneNumber: user?.number,
       leaveStartDate,
       leaveEndDate: isMultipleDays ? leaveEndDate : leaveStartDate,
       leaveReason,
