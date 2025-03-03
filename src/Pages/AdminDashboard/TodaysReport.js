@@ -284,7 +284,7 @@ const TodaysReport = () => {
             </div>
           )}
 
-          {storedUser?.role === "super admin" && (
+          {(storedUser?.role === "super admin" || storedUser?.role === "RSM") && (
             <div className="mb-4 w-[100%]">
               <label className="block text-gray-700 font-bold mb-2">
                 Filter by Zone:
