@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [totalWorkingDays, setTotalWorkingDays] = useState(null);
   const [pendingReq, setPendingReq] = useState(0);
+  const [zone, setZone] = useState("");
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const dayCount = dayjs(selectedMonth).daysInMonth();
@@ -30,10 +31,10 @@ const AdminDashboard = () => {
       selectedMonth,
       selectedRole,
       storedUser.group || (selectedRole === "super admin" ? "" : group),
-      storedUser.zone
+      storedUser.zone || (selectedRole === "super admin" ? "" : zone)
     );
     fetchPendingRequest();
-  }, [selectedMonth, selectedRole, group]);
+  }, [selectedMonth, selectedRole, group, zone]);
 
   const fetchPendingRequest = async () => {
     try {
@@ -320,7 +321,31 @@ const AdminDashboard = () => {
               <option value="MR">MR</option>
             </select>
           </div>
+
+          {(storedUser?.role === "super admin" || storedUser?.role === "RSM") && (
+            <div className="mb-4 w-[100%]">
+              <label className="block text-gray-700 font-bold mb-2">
+                Filter by Zone:
+              </label>
+              <select
+                value={zone}
+                onChange={(e) => setZone(e.target.value)}
+                className="border rounded px-2 py-1"
+              >
+                <option value="">Select Zone</option>
+                <option value="Gulshan">Gulshan</option>
+                <option value="Mirpur">Mirpur</option>
+                <option value="Dhanmondi">Dhanmondi</option>
+                <option value="Uttara">Uttara</option>
+                <option value="Chittagong">Chittagong</option>
+                <option value="Sylhet">Sylhet</option>
+                <option value="Old Town">Old Town</option>
+              </select>
+            </div>
+          )}
         </div>
+
+ 
 
         {loading ? (
           <p>Loading...</p>
