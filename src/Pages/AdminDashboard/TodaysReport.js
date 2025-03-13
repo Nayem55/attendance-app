@@ -32,9 +32,9 @@ const TodaysReport = () => {
       selectedDate,
       selectedRole,
       storedUser.group || (selectedRole === "super admin" ? "" : group),
-        
+      storedUser.zone || (selectedRole === "super admin" ? "" : zone)  
     );
-  }, [selectedDate, selectedRole, group,zone]);
+  }, [selectedDate, selectedRole, group, zone]);
 
   const fetchReports = async (date, role, group, zone) => {
     setLoading(true);
