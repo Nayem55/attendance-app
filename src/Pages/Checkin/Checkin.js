@@ -277,7 +277,7 @@ const CheckInPage = () => {
             handleCapture(
               user && user?.checkIn
                 ? "4e39d9a56fb9811d41976558d1f298cf"
-                : "adc5db0b0396705fea48bd60e83eb583"
+                : "cd7c6007e9bf08cd6ce77a047fc79883"
             )
           }
           className="w-full mt-4 bg-[#002B54] text-white py-2 rounded-lg"
