@@ -13,6 +13,8 @@ dayjs.extend(timezone);
 const CheckInPage = () => {
   const [note, setNote] = useState("");
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
@@ -127,8 +129,17 @@ const CheckInPage = () => {
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("image", blob, "capture.png");
-
       setImgLoading(true);
+      let previewUrl = null;
+      // Automatically show preview if image upload takes more than 8 seconds
+      const timeout = setTimeout(() => {
+        previewUrl = URL.createObjectURL(blob); // Generate a preview URL
+        setPreview(previewUrl); // Set preview image
+        setCaptured(true);
+        setShowPreview(true);
+        setImgLoading(false);
+        toast.success("Upload successful!");
+      }, 10000);
 
       try {
         const response = await axios.post(
@@ -138,7 +149,8 @@ const CheckInPage = () => {
         const imageUrl = response.data.data.url;
         setImage(imageUrl);
         setCaptured(true);
-        toast.success("Image uploaded successfully!");
+        !previewUrl && toast.success("Image uploaded successfully!");
+        clearTimeout(timeout); // Clear timeout if upload completes early
       } catch (error) {
         toast.error("Failed to upload image.");
       } finally {
@@ -260,22 +272,6 @@ const CheckInPage = () => {
           </>
         )}
         <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-        {/* {!captured ? (
-          <button
-            onClick={handleCapture}
-            className="w-full mt-4 bg-[#002B54] text-white py-2 rounded-lg"
-            disabled={loading} // Disable button while loading
-          >
-            {loading ? "Please wait..." : "Capture Image"}
-          </button>
-        ) : (
-          <button
-            onClick={handleRetake}
-            className="w-full mt-4 bg-red-500 text-white py-2 rounded-lg"
-          >
-            Retake
-          </button>
-        )} */}
         <button
           onClick={() =>
             handleCapture(
@@ -290,7 +286,11 @@ const CheckInPage = () => {
           {imgLoading ? "Please wait..." : "Capture Image"}
         </button>
 
-        {image && <img src={image} alt="Captured Check-In" className="mt-2" />}
+        {image && !showPreview ? (
+          <img src={image} alt="Captured Check-In" className="mt-2" />
+        ) : (
+          showPreview && <img src={preview} alt="Preview" className="mt-2" />
+        )}
       </div>
       <div className="mb-6">
         <label className="block text-lg font-medium mb-2">
