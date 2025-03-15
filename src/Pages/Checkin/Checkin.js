@@ -152,7 +152,7 @@ const CheckInPage = () => {
         !previewUrl && toast.success("Image uploaded successfully!");
         clearTimeout(timeout); // Clear timeout if upload completes early
       } catch (error) {
-        toast.error("Failed to upload image.");
+        !previewUrl && toast.error("Failed to upload image.");
       } finally {
         setImgLoading(false);
       }
