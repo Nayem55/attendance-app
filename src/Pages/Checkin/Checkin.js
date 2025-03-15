@@ -159,6 +159,52 @@ const CheckInPage = () => {
     }, "image/png");
   };
 
+  // const handleCapture = async (key) => {
+  //   const canvas = canvasRef.current;
+  //   const context = canvas.getContext("2d");
+  //   const video = videoRef.current;
+  
+  //   canvas.width = video.videoWidth;
+  //   canvas.height = video.videoHeight;
+  //   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+  //   canvas.toBlob(async (blob) => {
+  //     const formData = new FormData();
+  //     formData.append("file", blob, "capture.png");
+  //     formData.append("upload_preset", "flormar"); // Replace with your Cloudinary upload preset
+  //     formData.append("expires", 172800); // Set expiration time (in seconds), e.g., 48 hours = 172800 seconds
+  
+  //     setImgLoading(true);
+  //     let previewUrl = null;
+  //     // Automatically show preview if image upload takes more than 8 seconds
+  //     const timeout = setTimeout(() => {
+  //       previewUrl = URL.createObjectURL(blob); // Generate a preview URL
+  //       setPreview(previewUrl); // Set preview image
+  //       setCaptured(true);
+  //       setShowPreview(true);
+  //       setImgLoading(false);
+  //       toast.success("Upload successful!");
+  //     }, 10000);
+  
+  //     try {
+  //       const response = await axios.post(
+  //         `https://api.cloudinary.com/v1_1/dkozpbeg3/image/upload`, // Replace with your Cloudinary cloud name
+  //         formData
+  //       );
+  //       const imageUrl = response.data.secure_url; // Cloudinary returns image URL under 'secure_url'
+  //       setImage(imageUrl);
+  //       setCaptured(true);
+  //       !previewUrl && toast.success("Image uploaded successfully!");
+  //       clearTimeout(timeout); // Clear timeout if upload completes early
+  //     } catch (error) {
+  //       !previewUrl && toast.error("Failed to upload image.");
+  //     } finally {
+  //       setImgLoading(false);
+  //     }
+  //   }, "image/png");
+  // };
+  
+
   const handleRetake = () => {
     setImage(null);
     setCaptured(false);
