@@ -252,8 +252,10 @@ const CheckInPage = () => {
 
     const location = await fetchUserLocation();
 
+    const inTime = user?.role === "office" ? 10 : 11 ;
+
     const status =
-      checkInHour > 11 || (checkInHour === 11 && checkInMinute > 0)
+      checkInHour > inTime || (checkInHour === inTime && checkInMinute > 15)
         ? "Late"
         : "Success";
 
@@ -295,8 +297,10 @@ const CheckInPage = () => {
 
     const location = await fetchUserLocation();
 
+    const outTime = user?.role === "office" ? 20 : 22 ;
+
     const status =
-      checkOutHour > 22 || (checkOutHour === 22 && checkOutMinute >= 0)
+      checkOutHour > outTime || (checkOutHour === outTime && checkOutMinute >= 0)
         ? "Overtime"
         : "Success";
 
