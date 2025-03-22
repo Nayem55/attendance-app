@@ -117,48 +117,6 @@ const CheckInPage = () => {
     startCamera();
   }, []);
 
-  const handleCapture = async (key) => {
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    const video = videoRef.current;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    canvas.toBlob(async (blob) => {
-      const formData = new FormData();
-      formData.append("image", blob, "capture.png");
-      setImgLoading(true);
-      let previewUrl = null;
-      // Automatically show preview if image upload takes more than 8 seconds
-      const timeout = setTimeout(() => {
-        previewUrl = URL.createObjectURL(blob); // Generate a preview URL
-        setPreview(previewUrl); // Set preview image
-        setCaptured(true);
-        setShowPreview(true);
-        setImgLoading(false);
-        toast.success("Upload successful!");
-      }, 10000);
-
-      try {
-        const response = await axios.post(
-          `https://api.imgbb.com/1/upload?expiration=172800&key=${key}`,
-          formData
-        );
-        const imageUrl = response.data.data.url;
-        setImage(imageUrl);
-        setCaptured(true);
-        !previewUrl && toast.success("Image uploaded successfully!");
-        clearTimeout(timeout); // Clear timeout if upload completes early
-      } catch (error) {
-        !previewUrl && toast.error("Failed to upload image.");
-      } finally {
-        setImgLoading(false);
-      }
-    }, "image/png");
-  };
-
   // const handleCapture = async (key) => {
   //   const canvas = canvasRef.current;
   //   const context = canvas.getContext("2d");
@@ -168,42 +126,11 @@ const CheckInPage = () => {
   //   canvas.height = video.videoHeight;
   //   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  //   // Resize image if it's too large
-  //   const maxWidth = 240;
-  //   const maxHeight = 320;
-
-  //   let width = canvas.width;
-  //   let height = canvas.height;
-
-  //   // Resize image if dimensions are larger than max allowed
-  //   if (width > maxWidth || height > maxHeight) {
-  //     const aspectRatio = width / height;
-  //     if (width > height) {
-  //       width = maxWidth;
-  //       height = Math.round(width / aspectRatio);
-  //     } else {
-  //       height = maxHeight;
-  //       width = Math.round(height * aspectRatio);
-  //     }
-  //   }
-
-  //   // Create a new canvas for resized image
-  //   const resizedCanvas = document.createElement("canvas");
-  //   const resizedContext = resizedCanvas.getContext("2d");
-  //   resizedCanvas.width = width;
-  //   resizedCanvas.height = height;
-  //   resizedContext.drawImage(canvas, 0, 0, width, height);
-
-  //   // Convert resized image to blob
-  //   resizedCanvas.toBlob(async (blob) => {
+  //   canvas.toBlob(async (blob) => {
   //     const formData = new FormData();
   //     formData.append("image", blob, "capture.png");
-  //     formData.append("upload_preset", "flormar"); // Replace with your Cloudinary upload preset
-  //     formData.append("expires", 172800); // Set expiration time (in seconds), e.g., 48 hours = 172800 seconds
-
   //     setImgLoading(true);
   //     let previewUrl = null;
-
   //     // Automatically show preview if image upload takes more than 8 seconds
   //     const timeout = setTimeout(() => {
   //       previewUrl = URL.createObjectURL(blob); // Generate a preview URL
@@ -212,14 +139,14 @@ const CheckInPage = () => {
   //       setShowPreview(true);
   //       setImgLoading(false);
   //       toast.success("Upload successful!");
-  //     }, 10000);
+  //     }, 15000);
 
   //     try {
   //       const response = await axios.post(
   //         `https://api.imgbb.com/1/upload?expiration=172800&key=${key}`,
   //         formData
   //       );
-  //       const imageUrl = response.data.data.url; // ImgBB returns image URL under 'data.url'
+  //       const imageUrl = response.data.data.url;
   //       setImage(imageUrl);
   //       setCaptured(true);
   //       !previewUrl && toast.success("Image uploaded successfully!");
@@ -231,6 +158,79 @@ const CheckInPage = () => {
   //     }
   //   }, "image/png");
   // };
+
+  const handleCapture = async (key) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    const video = videoRef.current;
+  
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+    // Resize only if the image is too large
+    const maxWidth = 240; // Set max width
+    const maxHeight = 320; // Set max height
+    let width = canvas.width;
+    let height = canvas.height;
+  
+    // Resize if the image is too large
+    if (width > maxWidth || height > maxHeight) {
+      const aspectRatio = width / height;
+      if (width > height) {
+        width = maxWidth;
+        height = Math.round(width / aspectRatio);
+      } else {
+        height = maxHeight;
+        width = Math.round(height * aspectRatio);
+      }
+    }
+  
+    // Create a new canvas for resizing
+    const resizedCanvas = document.createElement("canvas");
+    const resizedContext = resizedCanvas.getContext("2d");
+    resizedCanvas.width = width;
+    resizedCanvas.height = height;
+    resizedContext.drawImage(canvas, 0, 0, width, height);
+  
+    // Convert resized image to Blob
+    resizedCanvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("file", blob, "capture.png");
+      formData.append("upload_preset", "flormar"); // Replace with your Cloudinary upload preset
+      formData.append("expires", 172800); // Set expiration time (in seconds)
+  
+      setImgLoading(true);
+      let previewUrl = null;
+  
+      // Automatically show preview if image upload takes more than 8 seconds
+      const timeout = setTimeout(() => {
+        previewUrl = URL.createObjectURL(blob); // Generate a preview URL
+        setPreview(previewUrl); // Set preview image
+        setCaptured(true);
+        setShowPreview(true);
+        setImgLoading(false);
+        toast.success("Upload successful!");
+      }, 10000);
+  
+      try {
+        const response = await axios.post(
+          `https://api.cloudinary.com/v1_1/dkozpbeg3/image/upload`, // Replace with your Cloudinary cloud name
+          formData
+        );
+        const imageUrl = response.data.secure_url; // Cloudinary returns image URL under 'secure_url'
+        setImage(imageUrl);
+        setCaptured(true);
+        !previewUrl && toast.success("Image uploaded successfully!");
+        clearTimeout(timeout); // Clear timeout if upload completes early
+      } catch (error) {
+        !previewUrl && toast.error("Failed to upload image.");
+      } finally {
+        setImgLoading(false);
+      }
+    }, "image/png");
+  };
+  
 
   const handleRetake = () => {
     setImage(null);
