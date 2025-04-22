@@ -233,12 +233,14 @@ const AdminDashboard = () => {
           >
             Monthly Details
           </Link>
-          <Link
-            to="/admin/applications"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Leave Requests
-          </Link>
+          {storedUser.role !== "inspect" && (
+            <Link
+              to="/admin/applications"
+              className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+            >
+              Leave Requests
+            </Link>
+          )}
           {storedUser?.role === "super admin" && (
             <Link
               to="/admin/user"
@@ -279,7 +281,7 @@ const AdminDashboard = () => {
               className="border rounded px-2 py-1"
             />
           </div>
-          {storedUser?.role === "super admin" && (
+          {(storedUser?.role === "super admin" || storedUser?.role === "inspect" ) && (
             <div>
               <label className="mr-2 font-semibold">Filter by Group:</label>
               <select
@@ -322,7 +324,8 @@ const AdminDashboard = () => {
             </select>
           </div>
 
-          {(storedUser?.role === "super admin" || storedUser?.role === "RSM") && (
+          {(storedUser?.role === "super admin" || storedUser?.role === "inspect"  ||
+            storedUser?.role === "RSM") && (
             <div className="mb-4 w-[100%]">
               <label className="block text-gray-700 font-bold mb-2">
                 Filter by Zone:
@@ -344,8 +347,6 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
-
- 
 
         {loading ? (
           <p>Loading...</p>

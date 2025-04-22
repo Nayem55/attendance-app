@@ -33,8 +33,7 @@ const ApplicationsPage = () => {
         setApplications(
           response.data.filter(
             (data) =>
-              storedUser.group === data.group &&
-              storedUser.zone === data.zone
+              storedUser.group === data.group && storedUser.zone === data.zone
           ) || []
         );
       } else {
@@ -124,12 +123,14 @@ const ApplicationsPage = () => {
           >
             Monthly Details
           </Link>
-          <Link
-            to="/admin/applications"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Leave Requests
-          </Link>
+          {storedUser.role !== "inspect" && (
+            <Link
+              to="/admin/applications"
+              className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+            >
+              Leave Requests
+            </Link>
+          )}
           {storedUser?.role === "super admin" && (
             <Link
               to="/admin/user"

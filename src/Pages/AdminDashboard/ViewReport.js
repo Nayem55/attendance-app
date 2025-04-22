@@ -162,12 +162,14 @@ const ViewReport = () => {
           >
             Monthly Details
           </Link>
-          <Link
-            to="/admin/applications"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Leave Requests
-          </Link>
+          {storedUser.role !== "inspect" && (
+            <Link
+              to="/admin/applications"
+              className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+            >
+              Leave Requests
+            </Link>
+          )}
           {storedUser?.role === "super admin" && (
             <Link
               to="/admin/user"
@@ -231,9 +233,11 @@ const ViewReport = () => {
                     Check-Out Location
                   </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Update Status
-                  </th>
+                  {storedUser.role !== "inspect" && (
+                    <th className="border border-gray-300 px-4 py-2">
+                      Update Status
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -277,29 +281,31 @@ const ViewReport = () => {
                     >
                       {record.status}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
-                      <select
-                        className="px-2 py-1"
-                        value={updatedStatuses[record.checkInId] || ""}
-                        onChange={(e) =>
-                          handleStatusChange(record.checkInId, e.target.value)
-                        }
-                      >
-                        <option value="">Update Status</option>
-                        <option value="Approved Late">Approved Late</option>
-                        <option value="Rejected">Rejected</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Approved Leave">Approved Leave</option>
-                        <option value="Success">Success</option>
-                        <option value="Late">Late</option>
-                      </select>
-                      <button
-                        onClick={() => saveStatus(record.checkInId)}
-                        className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
-                      >
-                        Save
-                      </button>
-                    </td>
+                    {storedUser.role !== "inspect" && (
+                      <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
+                        <select
+                          className="px-2 py-1"
+                          value={updatedStatuses[record.checkInId] || ""}
+                          onChange={(e) =>
+                            handleStatusChange(record.checkInId, e.target.value)
+                          }
+                        >
+                          <option value="">Update Status</option>
+                          <option value="Approved Late">Approved Late</option>
+                          <option value="Rejected">Rejected</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Approved Leave">Approved Leave</option>
+                          <option value="Success">Success</option>
+                          <option value="Late">Late</option>
+                        </select>
+                        <button
+                          onClick={() => saveStatus(record.checkInId)}
+                          className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
+                        >
+                          Save
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

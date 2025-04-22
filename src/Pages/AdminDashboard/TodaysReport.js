@@ -32,7 +32,7 @@ const TodaysReport = () => {
       selectedDate,
       selectedRole,
       storedUser.group || (selectedRole === "super admin" ? "" : group),
-      storedUser.zone || (selectedRole === "super admin" ? "" : zone)  
+      storedUser.zone || (selectedRole === "super admin" ? "" : zone)
     );
   }, [selectedDate, selectedRole, group, zone]);
 
@@ -168,8 +168,7 @@ const TodaysReport = () => {
       "Check-out Location": report.checkOutLocation,
       "Check-in Image": report.checkInImage,
       "Check-out Image": report.checkOutImage,
-      "Status" : report.status
-
+      Status: report.status,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -216,12 +215,14 @@ const TodaysReport = () => {
           >
             Monthly Details
           </Link>
-          <Link
-            to="/admin/applications"
-            className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
-          >
-            Leave Requests
-          </Link>
+          {storedUser.role !== "inspect" && (
+            <Link
+              to="/admin/applications"
+              className="px-4 py-2 rounded hover:bg-gray-700 focus:bg-gray-700"
+            >
+              Leave Requests
+            </Link>
+          )}
           {storedUser?.role === "super admin" && (
             <Link
               to="/admin/user"
@@ -246,8 +247,8 @@ const TodaysReport = () => {
         <p className="mb-6 font-bold text-[#0DC180]">
           Total Check In : {todaysReports?.length}
         </p>
-         {/* Export Button */}
-         <button
+        {/* Export Button */}
+        <button
           onClick={exportToExcel}
           className="mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
@@ -267,7 +268,7 @@ const TodaysReport = () => {
             />
           </div>
 
-          {storedUser?.role === "super admin" && (
+          {(storedUser?.role === "super admin"||storedUser?.role === "inspect") && (
             <div className="mb-4 w-[100%]">
               <label className="block text-gray-700 font-bold mb-2">
                 Filter by Group:
@@ -284,7 +285,8 @@ const TodaysReport = () => {
             </div>
           )}
 
-          {(storedUser?.role === "super admin" || storedUser?.role === "RSM") && (
+          {(storedUser?.role === "super admin" || storedUser?.role === "inspect" ||
+            storedUser?.role === "RSM") && (
             <div className="mb-4 w-[100%]">
               <label className="block text-gray-700 font-bold mb-2">
                 Filter by Zone:
@@ -379,7 +381,9 @@ const TodaysReport = () => {
                   <th className="border border-gray-300 px-4 py-2">
                     Attendance Status
                   </th>
-                  <th className="border border-gray-300 px-4 py-2">Action</th>
+                  {storedUser.role !== "inspect" && (
+                    <th className="border border-gray-300 px-4 py-2">Action</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -448,29 +452,31 @@ const TodaysReport = () => {
                     >
                       {report.status}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
-                      <select
-                        className="px-2 py-1"
-                        value={updatedStatuses[report.checkInId] || ""}
-                        onChange={(e) =>
-                          handleStatusChange(report.checkInId, e.target.value)
-                        }
-                      >
-                        <option value="">Update Status</option>
-                        <option value="Approved Late">Approved Late</option>
-                        <option value="Rejected">Rejected</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Approved Leave">Approved Leave</option>
-                        <option value="Success">Success</option>
-                        <option value="Late">Late</option>
-                      </select>
-                      <button
-                        onClick={() => saveStatus(report.checkInId)}
-                        className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
-                      >
-                        Save
-                      </button>
-                    </td>
+                    {storedUser.role !== "inspect" && (
+                      <td className="border border-gray-300 px-4 py-2 flex gap-4 items-center">
+                        <select
+                          className="px-2 py-1"
+                          value={updatedStatuses[report.checkInId] || ""}
+                          onChange={(e) =>
+                            handleStatusChange(report.checkInId, e.target.value)
+                          }
+                        >
+                          <option value="">Update Status</option>
+                          <option value="Approved Late">Approved Late</option>
+                          <option value="Rejected">Rejected</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Approved Leave">Approved Leave</option>
+                          <option value="Success">Success</option>
+                          <option value="Late">Late</option>
+                        </select>
+                        <button
+                          onClick={() => saveStatus(report.checkInId)}
+                          className="bg-[#1F2937] hover:bg-[#F16F24] ease-in-out duration-200 text-white px-2 py-1 rounded"
+                        >
+                          Save
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
